@@ -4,6 +4,9 @@ Implementação completa do desafio frontend **GreenMint / Kurio NFT Marketplace
 
 Design original e tokens visuais sincronizados com o [Figma oficial do desafio](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1).
 
+🔗 **Deploy de Produção na Vercel:** [https://marketplace-nft-pi.vercel.app/](https://marketplace-nft-pi.vercel.app/)  
+📂 **Repositório GitHub:** [https://github.com/igorland1/marketplace-nft](https://github.com/igorland1/marketplace-nft)
+
 ---
 
 ## 🚀 Como Executar o Projeto
