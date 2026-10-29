@@ -43,10 +43,10 @@ export function LoginPage() {
   return (
     <form onSubmit={submit} noValidate className="mx-auto max-w-sm space-y-4 py-10">
       <h1 className="text-2xl font-bold">Entrar</h1>
-      {search.expired && <p role="status" className="rounded bg-amber-500/10 p-2 text-sm text-amber-700">Sua sessão expirou. Entre novamente para continuar.</p>}
+      {search.expired && <p role="status" className="rounded bg-primary/10 p-2 text-sm text-primary">Sua sessão expirou. Entre novamente para continuar.</p>}
       <Field id="email" label="E-mail" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} error={errors.email} />
       <Field id="password" label="Senha" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
-      {formError && <p role="alert" className="text-sm text-red-600">{formError}</p>}
+      {formError && <p role="alert" className="text-sm text-destructive">{formError}</p>}
       <Button type="submit" className="w-full" disabled={busy}>{busy ? 'Entrando…' : 'Entrar'}</Button>
       <p className="text-sm text-muted-foreground">
         Demo: satoshi@greenmint.io / password123 · <Link to="/register" className="underline">Criar conta</Link>
@@ -92,7 +92,7 @@ export function RegisterPage() {
       <Field id="username" label="Usuário" value={f.username} onChange={set('username')} error={errors.username} />
       <Field id="email" label="E-mail" type="email" value={f.email} onChange={set('email')} error={errors.email} />
       <Field id="password" label="Senha" type="password" autoComplete="new-password" value={f.password} onChange={set('password')} error={errors.password} />
-      {formError && <p role="alert" className="text-sm text-red-600">{formError}</p>}
+      {formError && <p role="alert" className="text-sm text-destructive">{formError}</p>}
       <Button type="submit" className="w-full" disabled={busy}>{busy ? 'Criando…' : 'Cadastrar'}</Button>
       <p className="text-sm text-muted-foreground">Já tem conta? <Link to="/login" search={{}} className="underline">Entrar</Link></p>
     </form>

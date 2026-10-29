@@ -39,7 +39,7 @@ function ProfileForm({ profile }: { profile: User }) {
       <Field id="p-name" label="Nome" value={name} onChange={(e) => setName(e.target.value)} error={errors.name} />
       <Field id="p-username" label="Usuário" value={username} onChange={(e) => setUsername(e.target.value)} error={errors.username} />
       <Field id="p-bio" label="Bio" value={bio} onChange={(e) => setBio(e.target.value)} />
-      {msg && <p role="status" className={msg.ok ? 'text-sm text-emerald-600' : 'text-sm text-red-600'}>{msg.text}</p>}
+      {msg && <p role="status" className={msg.ok ? 'text-sm text-primary' : 'text-sm text-destructive'}>{msg.text}</p>}
       <Button type="submit" disabled={update.isPending}>Salvar alterações</Button>
     </form>
   );
@@ -73,7 +73,7 @@ function PasswordForm() {
       <h2 className="text-lg font-semibold">Alterar senha</h2>
       <Field id="cur" label="Senha atual" type="password" autoComplete="current-password" value={cur} onChange={(e) => setCur(e.target.value)} error={errors.cur} />
       <Field id="next" label="Nova senha" type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} error={errors.next} />
-      {msg && <p role="status" className={msg.ok ? 'text-sm text-emerald-600' : 'text-sm text-red-600'}>{msg.text}</p>}
+      {msg && <p role="status" className={msg.ok ? 'text-sm text-primary' : 'text-sm text-destructive'}>{msg.text}</p>}
       <Button type="submit" variant="outline" disabled={change.isPending}>Alterar senha</Button>
     </form>
   );

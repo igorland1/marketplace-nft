@@ -39,7 +39,7 @@ export function CartPage() {
         <h1 id="cart-title" className="text-2xl font-bold">Carrinho de NFTs</h1>
         <ul className="space-y-3">
           {cart.items.map((i) => (
-            <li key={i.editionId} className="flex gap-3 rounded-xl border p-3">
+            <li key={i.editionId} className="flex gap-3 rounded-lg border p-3">
               <img src={i.imageUrl} alt="" className="h-20 w-20 rounded-lg object-cover" />
               <div className="flex-1">
                 <Link to="/nft/$id" params={{ id: i.nftId }} className="font-semibold hover:underline">{i.name}</Link>
@@ -52,7 +52,7 @@ export function CartPage() {
                   <Button variant="outline" size="icon" aria-label="Aumentar" disabled={i.quantity >= i.availableQuantity}
                     onClick={() => update.mutate({ nftId: i.nftId, editionId: i.editionId, quantity: i.quantity + 1 })}>+</Button>
                 </div>
-                {i.quantity >= i.availableQuantity && <p className="mt-1 text-xs text-amber-600">Quantidade máxima disponível.</p>}
+                {i.quantity >= i.availableQuantity && <p className="mt-1 text-xs text-primary">Quantidade máxima disponível.</p>}
               </div>
               <div className="flex flex-col items-end justify-between">
                 <span className="font-semibold">{i.totalPriceEth} ETH</span>
@@ -66,10 +66,10 @@ export function CartPage() {
         </ul>
       </section>
 
-      <aside aria-labelledby="summary" className="h-fit space-y-4 rounded-xl border p-4">
+      <aside aria-labelledby="summary" className="h-fit space-y-4 rounded-lg border p-4">
         <h2 id="summary" className="font-bold">Resumo</h2>
         {cart.appliedCoupon ? (
-          <div className="flex items-center justify-between rounded-lg bg-emerald-500/10 p-2 text-sm">
+          <div className="flex items-center justify-between rounded-lg bg-primary/10 p-2 text-sm">
             <span>Cupom <strong>{cart.appliedCoupon.code}</strong> aplicado</span>
             <Button variant="ghost" size="sm" onClick={() => removeCoupon.mutate()}>Remover</Button>
           </div>
@@ -86,7 +86,7 @@ export function CartPage() {
               <Input aria-label="Cupom" placeholder="Cupom" value={code} onChange={(e) => setCode(e.target.value)} />
               <Button type="submit" variant="outline" disabled={!code.trim() || apply.isPending}>Aplicar</Button>
             </div>
-            {couponError && <p role="alert" className="text-xs text-red-600">{couponError}</p>}
+            {couponError && <p role="alert" className="text-xs text-destructive">{couponError}</p>}
           </form>
         )}
         <dl className="space-y-1 text-sm">

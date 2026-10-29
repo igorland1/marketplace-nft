@@ -22,8 +22,13 @@ export function CheckoutPage() {
   const { data: wallets } = useWallets();
   const createOrder = useCreateOrder();
 
-  const [name, setName] = useState(user?.name ?? '');
-  const [email, setEmail] = useState(user?.email ?? '');
+  const [customName, setCustomName] = useState<string | null>(null);
+  const [customEmail, setCustomEmail] = useState<string | null>(null);
+
+  const name = customName ?? user?.name ?? '';
+  const email = customEmail ?? user?.email ?? '';
+  const setName = setCustomName;
+  const setEmail = setCustomEmail;
   const [walletId, setWalletId] = useState('');
   const [network, setNetwork] = useState<NetworkType | ''>('');
   const [conn, setConn] = useState<Conn>('disconnected');
@@ -144,16 +149,16 @@ export function CheckoutPage() {
                 )}
                 <span role="status" className="text-sm">
                   {conn === 'connected' && '✓ Conectada'}
-                  {conn === 'refused' && <span className="text-red-600">Conexão recusada pela carteira.</span>}
+                  {conn === 'refused' && <span className="text-destructive">Conexão recusada pela carteira.</span>}
                 </span>
               </div>
             </>
           )}
-          {errors.wallet && <p role="alert" className="text-xs text-red-600">{errors.wallet}</p>}
+          {errors.wallet && <p role="alert" className="text-xs text-destructive">{errors.wallet}</p>}
         </fieldset>
 
-        {error && <p role="alert" className="rounded bg-red-500/10 p-2 text-sm text-red-600">{error}</p>}
-        {notice && <p role="status" className="rounded bg-amber-500/10 p-2 text-sm text-amber-700">{notice}</p>}
+        {error && <p role="alert" className="rounded bg-destructive/10 p-2 text-sm text-destructive">{error}</p>}
+        {notice && <p role="status" className="rounded bg-primary/10 p-2 text-sm text-primary">{notice}</p>}
 
         {!quote ? (
           <Button type="submit" disabled={busy}>{busy ? 'Verificando…' : 'Revisar pedido'}</Button>
@@ -165,7 +170,7 @@ export function CheckoutPage() {
         )}
       </form>
 
-      <aside aria-labelledby="order-sum" className="h-fit space-y-3 rounded-xl border p-4">
+      <aside aria-labelledby="order-sum" className="h-fit space-y-3 rounded-lg border p-4">
         <h2 id="order-sum" className="font-bold">Seu pedido</h2>
         <ul className="space-y-1 text-sm">
           {cart.items.map((i) => (

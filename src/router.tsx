@@ -4,6 +4,7 @@ import { queryClient } from '@/lib/queryClient';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useRealtimeSocket } from '@/hooks/useRealtimeSocket';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { buttonVariants } from '@/components/ui/button';
 import { HomePage, validateCatalogSearch } from '@/pages/HomePage';
 import { NFTDetailPage } from '@/pages/NFTDetailPage';
@@ -17,11 +18,12 @@ import { WalletsPage } from '@/pages/WalletsPage';
 function RootLayout() {
   const { isConnected } = useRealtimeSocket();
   return (
-    <div className="flex min-h-screen flex-col bg-background font-sans text-foreground">
+    <div className="flex min-h-screen flex-col bg-background font-mono text-foreground">
       <Header isLive={isConnected} />
-      <main className="mx-auto w-full max-w-7xl flex-1 p-4">
+      <main className="mx-auto w-full max-w-[1200px] flex-1 p-4">
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 }

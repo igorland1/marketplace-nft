@@ -7,9 +7,9 @@ export function Badge({
 }: React.HTMLAttributes<HTMLSpanElement> & { tone?: 'default' | 'success' | 'danger' | 'warning' }) {
   const tones = {
     default: 'bg-muted text-muted-foreground',
-    success: 'bg-emerald-500/10 text-emerald-600',
-    danger: 'bg-red-500/10 text-red-600',
-    warning: 'bg-amber-500/10 text-amber-600',
+    success: 'bg-primary/10 text-primary',
+    danger: 'bg-destructive/10 text-destructive',
+    warning: 'bg-primary/10 text-primary',
   };
   return (
     <span

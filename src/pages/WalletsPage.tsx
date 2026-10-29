@@ -30,7 +30,7 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
   }
 
   return (
-    <form onSubmit={submit} noValidate className="space-y-3 rounded-xl border p-4">
+    <form onSubmit={submit} noValidate className="space-y-3 rounded-lg border p-4">
       <h2 className="font-semibold">{wallet ? 'Editar carteira' : 'Nova carteira'}</h2>
       <Field id="w-label" label="Nome" value={label} onChange={(e) => setLabel(e.target.value)} error={errors.label} />
       <Field id="w-address" label="Endereço" value={address} onChange={(e) => setAddress(e.target.value)} error={errors.address} />
@@ -43,7 +43,7 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={isPrimary} onChange={(e) => setIsPrimary(e.target.checked)} /> Carteira principal
       </label>
-      {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       <div className="flex gap-2">
         <Button type="submit" disabled={save.isPending}>Salvar</Button>
         <Button type="button" variant="outline" onClick={onDone}>Cancelar</Button>
@@ -66,7 +66,7 @@ export function WalletsPage() {
       {isLoading ? <Skeleton className="h-32" /> : (
         <ul className="space-y-2">
           {wallets?.map((w) => (
-            <li key={w.id} className="flex items-center justify-between rounded-xl border p-3">
+            <li key={w.id} className="flex items-center justify-between rounded-lg border p-3">
               <div className="text-sm">
                 <p className="font-semibold">{w.label} {w.isPrimary ? <Badge tone="success">Principal</Badge> : <Badge>Secundária</Badge>}</p>
                 <p className="text-muted-foreground">{w.address} · {w.network} · {w.balanceEth} ETH</p>

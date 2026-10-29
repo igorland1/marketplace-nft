@@ -13,7 +13,7 @@ export function Field({
       </label>
       <Input id={id} aria-invalid={!!error} aria-describedby={error ? `${id}-err` : undefined} {...props} />
       {error && (
-        <p id={`${id}-err`} role="alert" className="text-xs text-red-600">
+        <p id={`${id}-err`} role="alert" className="text-xs text-destructive">
           {error}
         </p>
       )}

@@ -28,11 +28,11 @@ export function OrderPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="text-center space-y-2">
-        <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" aria-hidden />
+        <CheckCircle2 className="mx-auto h-12 w-12 text-primary" aria-hidden />
         <h1 className="text-2xl font-bold">Pedido confirmado!</h1>
         <p className="text-sm text-muted-foreground">Pedido {order.orderId} · {new Date(order.createdAt).toLocaleString('pt-BR')}</p>
       </div>
-      <section aria-labelledby="tx" className="rounded-xl border p-4 text-sm space-y-1">
+      <section aria-labelledby="tx" className="rounded-lg border p-4 text-sm space-y-1">
         <h2 id="tx" className="font-semibold">Transação</h2>
         <p className="break-all">Hash: {order.transactionHash}</p>
         <p>Rede: {order.network} · Carteira: {order.walletAddress}</p>
@@ -40,7 +40,7 @@ export function OrderPage() {
       </section>
       <ul className="space-y-2">
         {order.items.map((i) => (
-          <li key={i.editionId} className="flex items-center gap-3 rounded-xl border p-3">
+          <li key={i.editionId} className="flex items-center gap-3 rounded-lg border p-3">
             <img src={i.imageUrl} alt="" className="h-14 w-14 rounded-lg object-cover" />
             <div className="flex-1 text-sm">
               <p className="font-semibold">{i.name}</p>
@@ -50,7 +50,7 @@ export function OrderPage() {
           </li>
         ))}
       </ul>
-      <dl className="space-y-1 rounded-xl border p-4 text-sm">
+      <dl className="space-y-1 rounded-lg border p-4 text-sm">
         <div className="flex justify-between"><dt>Subtotal</dt><dd>{order.subtotalEth} ETH</dd></div>
         <div className="flex justify-between"><dt>Desconto</dt><dd>− {order.discountEth} ETH</dd></div>
         <div className="flex justify-between"><dt>Taxa de rede</dt><dd>{order.networkFeeEth} ETH</dd></div>

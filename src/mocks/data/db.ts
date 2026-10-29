@@ -15,14 +15,14 @@ import {
 } from './fixtures';
 
 const STORAGE_KEYS = {
-  USERS: 'greenmint_db_users',
-  WALLETS: 'greenmint_db_wallets',
-  NFTS: 'greenmint_db_nfts',
-  CARTS: 'greenmint_db_carts', // map by userId or 'guest'
-  ORDERS: 'greenmint_db_orders',
-  FAVORITES: 'greenmint_db_favorites', // map userId -> nftIds[]
+  USERS: 'greenmint_db2_users',
+  WALLETS: 'greenmint_db2_wallets',
+  NFTS: 'greenmint_db2_nfts',
+  CARTS: 'greenmint_db2_carts', // map by userId or 'guest'
+  ORDERS: 'greenmint_db2_orders',
+  FAVORITES: 'greenmint_db2_favorites', // map userId -> nftIds[]
   SESSION: 'greenmint_auth_session',
-  PROCESSED_IDEMPOTENCY: 'greenmint_db_idempotency_keys',
+  PROCESSED_IDEMPOTENCY: 'greenmint_db2_idempotency_keys',
 };
 
 // Precise ETH decimal arithmetic utilities

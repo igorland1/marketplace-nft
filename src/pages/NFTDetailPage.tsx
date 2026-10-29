@@ -41,7 +41,7 @@ export function NFTDetailPage() {
 
   return (
     <div className="grid gap-8 md:grid-cols-2">
-      <img src={nft.imageUrl} alt={nft.name} className="aspect-square w-full rounded-xl object-cover" />
+      <img src={nft.imageUrl} alt={nft.name} className="aspect-square w-full rounded-lg object-cover" />
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">{nft.collection} · {nft.tokenId}</p>
         <h1 className="text-3xl font-bold">{nft.name}</h1>
@@ -60,16 +60,16 @@ export function NFTDetailPage() {
                 type="button"
                 aria-pressed={e.id === edition.id}
                 onClick={() => { setEditionId(e.id); setQty(1); setMsg(undefined); }}
-                className={`rounded-lg border px-3 py-2 text-left text-sm ${e.id === edition.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-border'}`}
+                className={`rounded-lg border px-3 py-2 text-left text-sm ${e.id === edition.id ? 'border-primary bg-primary/10' : 'border-border'}`}
               >
                 #{e.editionNumber}/{e.totalEditions} · {e.priceEth} ETH
-                {e.availableQuantity <= 0 && <span className="ml-2 text-red-600">Esgotada</span>}
+                {e.availableQuantity <= 0 && <span className="ml-2 text-destructive">Esgotada</span>}
               </button>
             ))}
           </div>
         </fieldset>
 
-        <p className="text-3xl font-bold text-emerald-600">{edition.priceEth} ETH</p>
+        <p className="text-3xl font-bold text-primary">{edition.priceEth} ETH</p>
         <p className="text-sm text-muted-foreground">
           {unavailable ? 'Edição indisponível' : `${edition.availableQuantity} disponíveis · limite de ${edition.maxQuantityPerUser} por colecionador`}
         </p>
@@ -99,10 +99,10 @@ export function NFTDetailPage() {
             aria-pressed={!!nft.isLiked}
             onClick={() => (isAuthenticated ? fav.mutate(nft.id) : navigate({ to: '/login', search: { redirect: `/nft/${nft.id}` } }))}
           >
-            <Heart className={`mr-1 h-4 w-4 ${nft.isLiked ? 'fill-red-500 text-red-500' : ''}`} aria-hidden /> {nft.likesCount}
+            <Heart className={`mr-1 h-4 w-4 ${nft.isLiked ? 'fill-destructive text-destructive' : ''}`} aria-hidden /> {nft.likesCount}
           </Button>
         </div>
-        {msg && <p role="status" className={msg.ok ? 'text-emerald-600 text-sm' : 'text-red-600 text-sm'}>{msg.text}</p>}
+        {msg && <p role="status" className={msg.ok ? 'text-primary text-sm' : 'text-destructive text-sm'}>{msg.text}</p>}
 
         <div>
           <h2 className="mb-2 font-semibold">Atributos</h2>

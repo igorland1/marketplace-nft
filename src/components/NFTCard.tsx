@@ -1,7 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Heart } from 'lucide-react';
 import { NFTItem } from '@/types';
-import { Badge } from '@/components/ui/badge';
 
 export function NFTCard({ nft }: { nft: NFTItem }) {
   const soldOut = nft.editions.every((e) => e.availableQuantity <= 0);
@@ -9,29 +7,15 @@ export function NFTCard({ nft }: { nft: NFTItem }) {
     <Link
       to="/nft/$id"
       params={{ id: nft.id }}
-      className="group block overflow-hidden rounded-xl border border-border bg-card transition hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring"
+      className="group relative block rounded-lg bg-card p-3 transition hover:ring-1 hover:ring-primary focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <div className="aspect-square overflow-hidden bg-muted">
-        <img
-          src={nft.imageUrl}
-          alt={nft.name}
-          loading="lazy"
-          className="h-full w-full object-cover transition group-hover:scale-105"
-        />
+      {soldOut && <span className="absolute left-3 top-3 z-10 bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-primary-foreground">Esgotado</span>}
+      <div className="aspect-square overflow-hidden rounded-md bg-background">
+        <img src={nft.imageUrl} alt={nft.name} loading="lazy" width={360} height={360} className="h-full w-full object-cover transition group-hover:scale-105" />
       </div>
-      <div className="space-y-1 p-3">
-        <p className="text-xs text-muted-foreground">{nft.collection}</p>
-        <h3 className="truncate font-semibold">{nft.name}</h3>
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-sm font-bold text-emerald-600">{nft.priceEth} ETH</span>
-          {soldOut ? (
-            <Badge tone="danger">Esgotado</Badge>
-          ) : (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Heart className="h-3 w-3" aria-hidden /> {nft.likesCount}
-            </span>
-          )}
-        </div>
+      <div className="space-y-1 pt-3 text-xs">
+        <h3 className="truncate font-normal">{nft.name}</h3>
+        <p className="font-bold text-primary">{nft.priceEth} ETH</p>
       </div>
     </Link>
   );
