@@ -11,6 +11,18 @@ function extractUserId(request: Request): string | null {
   return null;
 }
 
+const COLLECTION_ALIASES: Record<string, string> = {
+  digital_art: 'neo-tokyo-legends',
+  photography: 'algorithmic-wonders',
+  music: 'astral-odyssey',
+  '3d_art': 'neo-tokyo-legends',
+  collectibles: 'algorithmic-wonders',
+  generative: 'astral-odyssey',
+  gaming: 'neo-tokyo-legends',
+  memberships: 'algorithmic-wonders',
+  utility: 'astral-odyssey',
+};
+
 export const nftHandlers = [
   // GET /api/nfts - Catálogo com filtros, busca, ordenação e paginação
   http.get('/api/nfts', async ({ request }) => {
@@ -58,7 +70,8 @@ export const nftHandlers = [
 
     // Filter by collection slug
     if (collection && collection !== 'all') {
-      nfts = nfts.filter((nft) => nft.collectionSlug === collection);
+      const mapped = COLLECTION_ALIASES[collection] || collection;
+      nfts = nfts.filter((nft) => nft.collectionSlug === mapped || nft.collectionSlug === collection);
     }
 
     // Filter by min/max price

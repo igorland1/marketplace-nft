@@ -10,7 +10,11 @@ test('1. Busca, filtros combinados, ordenação, paginação e histórico', asyn
   await page.goto('/');
   await expect(page.locator('#catalogo')).toBeVisible();
 
-  // Busca debounced
+  // Busca no Header
+  const searchBtn = page.getByRole('button', { name: 'Abrir busca' });
+  if (await searchBtn.isVisible()) {
+    await searchBtn.click();
+  }
   const searchInput = page.getByLabel('Buscar NFTs');
   await searchInput.fill('Emerald');
   await page.waitForTimeout(600);
@@ -22,8 +26,8 @@ test('1. Busca, filtros combinados, ordenação, paginação e histórico', asyn
   await page.waitForTimeout(600);
 
   // Filtro de Coleção
-  await page.getByRole('button', { name: 'Neo Tokyo Legends' }).click();
-  await expect(page).toHaveURL(/collection=neo-tokyo-legends/);
+  await page.getByRole('button', { name: /Arte digital/i }).click();
+  await expect(page).toHaveURL(/collection=digital_art/);
 
   // Paginação
   await page.getByRole('button', { name: 'Todas' }).click();
@@ -225,9 +229,9 @@ test('8. Edição de perfil, avatar, senha e carteiras', async ({ page }) => {
   await expect(page.getByText('Nova Cold Storage')).toBeVisible();
 });
 
-test('9. Tempo Real Socket.IO e indicador ao vivo', async ({ page }) => {
+test('9. Tempo Real Socket.IO e conexão em tempo real', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByTitle(/tempo real ativas/i)).toBeVisible();
+  await expect(page.locator('[data-live="true"]')).toBeAttached();
 });
 
 test('10. Navegação por teclado e acessibilidade básica', async ({ page }) => {
