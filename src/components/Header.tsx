@@ -26,7 +26,7 @@ export function Header({ isLive }: { isLive: boolean }) {
             KURIO
             <span
               title={isLive ? 'Atualizações em tempo real ativas' : 'Sem conexão em tempo real'}
-              className={cn('hidden rounded px-1.5 py-0.5 text-[10px] font-medium sm:inline', isLive ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground')}
+              className={cn('inline-flex rounded px-1.5 py-0.5 text-[10px] font-medium', isLive ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground')}
             >
               {isLive ? '● ao vivo' : '○ offline'}
             </span>

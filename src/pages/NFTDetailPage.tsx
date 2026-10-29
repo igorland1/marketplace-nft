@@ -22,7 +22,21 @@ export function NFTDetailPage() {
   const [qty, setQty] = useState(1);
   const [msg, setMsg] = useState<{ ok: boolean; text: string }>();
 
-  if (isLoading) return <Skeleton className="h-96" />;
+  if (isLoading) {
+    return (
+      <div className="grid gap-8 md:grid-cols-2" aria-busy="true" aria-label="Carregando detalhes do NFT">
+        <Skeleton className="aspect-square w-full rounded-lg" />
+        <div className="space-y-4">
+          <Skeleton className="h-4 w-1/3" />
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-6 w-1/2" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      </div>
+    );
+  }
   if (axios.isAxiosError(error) && error.response?.status === 404) {
     return (
       <div className="py-16 text-center space-y-3">
@@ -41,7 +55,14 @@ export function NFTDetailPage() {
 
   return (
     <div className="grid gap-8 md:grid-cols-2">
-      <img src={nft.imageUrl} alt={nft.name} className="aspect-square w-full rounded-lg object-cover" />
+      <img
+        src={nft.imageUrl}
+        alt={nft.name}
+        width={600}
+        height={600}
+        fetchPriority="high"
+        className="aspect-square w-full rounded-lg object-cover"
+      />
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">{nft.collection} · {nft.tokenId}</p>
         <h1 className="text-3xl font-bold">{nft.name}</h1>

@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 *.tsbuildinfo
+
+# Test and Audit Reports
+test-results/
+playwright-report/
+lighthouse-reports/

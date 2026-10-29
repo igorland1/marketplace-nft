@@ -4,6 +4,7 @@ import { cartHandlers } from './cart';
 import { orderHandlers } from './orders';
 import { profileHandlers } from './profile';
 import { socketHandler } from '../socket';
+import { resetHandler } from './reset';
 
 export const handlers = [
   ...authHandlers,
@@ -11,5 +12,6 @@ export const handlers = [
   ...cartHandlers,
   ...orderHandlers,
   ...profileHandlers,
+  ...resetHandler,
   socketHandler,
 ];

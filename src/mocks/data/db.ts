@@ -18,14 +18,13 @@ const STORAGE_KEYS = {
   USERS: 'greenmint_db2_users',
   WALLETS: 'greenmint_db2_wallets',
   NFTS: 'greenmint_db2_nfts',
-  CARTS: 'greenmint_db2_carts', // map by userId or 'guest'
+  CARTS: 'greenmint_db2_carts',
   ORDERS: 'greenmint_db2_orders',
-  FAVORITES: 'greenmint_db2_favorites', // map userId -> nftIds[]
+  FAVORITES: 'greenmint_db2_favorites',
   SESSION: 'greenmint_auth_session',
   PROCESSED_IDEMPOTENCY: 'greenmint_db2_idempotency_keys',
 };
 
-// Precise ETH decimal arithmetic utilities
 export function ethAdd(a: string, b: string): string {
   const sum = Math.round((parseFloat(a) + parseFloat(b)) * 10000) / 10000;
   return sum.toFixed(4);
@@ -51,7 +50,17 @@ class MockDatabase {
   private idempotencyStore: Record<string, OrderReceipt> = {};
 
   constructor() {
-    this.init();
+    this.restore();
+  }
+
+  restore() {
+    this.users = this.load(STORAGE_KEYS.USERS, INITIAL_USERS);
+    this.wallets = this.load(STORAGE_KEYS.WALLETS, INITIAL_WALLETS);
+    this.nfts = this.load(STORAGE_KEYS.NFTS, INITIAL_NFTS);
+    this.carts = this.load(STORAGE_KEYS.CARTS, { guest: { items: [] } });
+    this.orders = this.load(STORAGE_KEYS.ORDERS, []);
+    this.favorites = this.load(STORAGE_KEYS.FAVORITES, { user_1: ['nft_1', 'nft_2'] });
+    this.idempotencyStore = this.load(STORAGE_KEYS.PROCESSED_IDEMPOTENCY, {});
   }
 
   private load<T>(key: string, fallback: T): T {
@@ -63,7 +72,7 @@ class MockDatabase {
     } catch {
       // Fallback on storage errors
     }
-    return fallback;
+    return JSON.parse(JSON.stringify(fallback));
   }
 
   private save<T>(key: string, data: T) {
@@ -77,16 +86,18 @@ class MockDatabase {
   }
 
   init() {
-    this.users = this.load(STORAGE_KEYS.USERS, INITIAL_USERS);
-    this.wallets = this.load(STORAGE_KEYS.WALLETS, INITIAL_WALLETS);
-    this.nfts = this.load(STORAGE_KEYS.NFTS, INITIAL_NFTS);
-    this.carts = this.load(STORAGE_KEYS.CARTS, { guest: { items: [] } });
-    this.orders = this.load(STORAGE_KEYS.ORDERS, []);
-    this.favorites = this.load(STORAGE_KEYS.FAVORITES, { user_1: ['nft_1', 'nft_2'] });
-    this.idempotencyStore = this.load(STORAGE_KEYS.PROCESSED_IDEMPOTENCY, {});
+    if (typeof window !== 'undefined' && window.localStorage) {
+      Object.values(STORAGE_KEYS).forEach((k) => window.localStorage.removeItem(k));
+    }
+    this.users = JSON.parse(JSON.stringify(INITIAL_USERS));
+    this.wallets = JSON.parse(JSON.stringify(INITIAL_WALLETS));
+    this.nfts = JSON.parse(JSON.stringify(INITIAL_NFTS));
+    this.carts = { guest: { items: [] } };
+    this.orders = [];
+    this.favorites = { user_1: ['nft_1', 'nft_2'] };
+    this.idempotencyStore = {};
   }
 
-  // Users & Auth
   getUsers() {
     return this.users;
   }
@@ -120,7 +131,6 @@ class MockDatabase {
     return null;
   }
 
-  // Wallets
   getUserWallets(userId: string) {
     return this.wallets.filter((w) => w.userId === userId);
   }
@@ -156,7 +166,6 @@ class MockDatabase {
     return newWallet;
   }
 
-  // NFTs
   getNFTs() {
     return this.nfts;
   }
@@ -193,7 +202,6 @@ class MockDatabase {
     return { nft, edition };
   }
 
-  // Favorites
   getFavorites(userId: string) {
     return this.favorites[userId] || [];
   }
@@ -220,21 +228,18 @@ class MockDatabase {
     return isFavorited;
   }
 
-  // Cart
   getCart(cartKey: string): CartSummary {
     if (!this.carts[cartKey]) {
       this.carts[cartKey] = { items: [] };
     }
     const cart = this.carts[cartKey];
-    
-    // Calculate subtotal
+
     let subtotalNum = 0;
     cart.items.forEach((item) => {
       subtotalNum += parseFloat(item.unitPriceEth) * item.quantity;
     });
     const subtotalEth = (Math.round(subtotalNum * 10000) / 10000).toFixed(4);
 
-    // Calculate discount
     let discountEth = '0.0000';
     if (cart.coupon) {
       const discountVal = (subtotalNum * cart.coupon.discountPercentage) / 100;
@@ -365,7 +370,6 @@ class MockDatabase {
     this.save(STORAGE_KEYS.CARTS, this.carts);
   }
 
-  // Orders & Idempotency
   getIdempotentOrder(key: string): OrderReceipt | undefined {
     return this.idempotencyStore[key];
   }

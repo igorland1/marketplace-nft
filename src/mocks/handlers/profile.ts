@@ -6,7 +6,12 @@ function extractUserId(request: Request): string | null {
   const authHeader = request.headers.get('Authorization');
   if (authHeader && authHeader.startsWith('Bearer mock_jwt_token_')) {
     const parts = authHeader.replace('Bearer ', '').split('_');
-    return `${parts[3]}_${parts[4]}`;
+    const userId = `${parts[3]}_${parts[4]}`;
+    // If user does not exist in mockDb, consider token invalid / expired (401)
+    if (!mockDb.findUserById(userId)) {
+      return null;
+    }
+    return userId;
   }
   return null;
 }
