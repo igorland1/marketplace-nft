@@ -1,39 +1,36 @@
-import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter, Link, Outlet, redirect } from '@tanstack/react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useRealtimeSocket } from '@/hooks/useRealtimeSocket';
-import { Button } from '@/components/ui/button';
+import { Header } from '@/components/Header';
+import { buttonVariants } from '@/components/ui/button';
+import { HomePage, validateCatalogSearch } from '@/pages/HomePage';
+import { NFTDetailPage } from '@/pages/NFTDetailPage';
+import { CartPage } from '@/pages/CartPage';
+import { CheckoutPage } from '@/pages/CheckoutPage';
+import { OrderPage } from '@/pages/OrderPage';
+import { LoginPage, RegisterPage } from '@/pages/AuthPages';
+import { ProfilePage } from '@/pages/ProfilePage';
+import { WalletsPage } from '@/pages/WalletsPage';
 
 function RootLayout() {
-  // Initialize and bind real-time socket events to TanStack Query cache
   const { isConnected } = useRealtimeSocket();
-
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
-      <header className="border-b border-border p-4 flex justify-between items-center max-w-7xl mx-auto w-full">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-bold">
-            G
-          </div>
-          <span className="font-bold text-xl tracking-tight">GreenMint</span>
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ml-2 ${
-              isConnected
-                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                : 'bg-muted text-muted-foreground'
-            }`}
-          >
-            {isConnected ? '● Ao Vivo' : '○ Offline'}
-          </span>
-        </div>
-        <Button variant="outline" size="sm">
-          Conectar Carteira
-        </Button>
-      </header>
-      <main className="flex-1 max-w-7xl mx-auto w-full p-4">
+    <div className="flex min-h-screen flex-col bg-background font-sans text-foreground">
+      <Header isLive={isConnected} />
+      <main className="mx-auto w-full max-w-7xl flex-1 p-4">
         <Outlet />
       </main>
+    </div>
+  );
+}
+
+function NotFound() {
+  return (
+    <div className="py-16 text-center space-y-3">
+      <h1 className="text-3xl font-bold">Página não encontrada</h1>
+      <Link to="/" className={buttonVariants()}>Ir para o início</Link>
     </div>
   );
 }
@@ -46,30 +43,37 @@ const rootRoute = createRootRoute({
       </AuthProvider>
     </QueryClientProvider>
   ),
+  notFoundComponent: NotFound,
 });
 
-const indexRoute = createRoute({
+// Private flows: redirect to login keeping the way back
+const requireAuth = ({ location }: { location: { pathname: string; search: unknown; searchStr?: string } }) => {
+  if (!localStorage.getItem('greenmint_auth_token')) {
+    throw redirect({ to: '/login', search: { redirect: location.pathname + (location.searchStr ?? '') } });
+  }
+};
+
+const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: HomePage, validateSearch: validateCatalogSearch });
+const nftRoute = createRoute({ getParentRoute: () => rootRoute, path: '/nft/$id', component: NFTDetailPage });
+const cartRoute = createRoute({ getParentRoute: () => rootRoute, path: '/cart', component: CartPage });
+const checkoutRoute = createRoute({ getParentRoute: () => rootRoute, path: '/checkout', component: CheckoutPage, beforeLoad: requireAuth });
+const orderRoute = createRoute({ getParentRoute: () => rootRoute, path: '/orders/$id', component: OrderPage, beforeLoad: requireAuth });
+const profileRoute = createRoute({ getParentRoute: () => rootRoute, path: '/profile', component: ProfilePage, beforeLoad: requireAuth });
+const walletsRoute = createRoute({ getParentRoute: () => rootRoute, path: '/wallets', component: WalletsPage, beforeLoad: requireAuth });
+const registerRoute = createRoute({ getParentRoute: () => rootRoute, path: '/register', component: RegisterPage });
+const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
-  component: function Index() {
-    return (
-      <div className="py-12 text-center space-y-4">
-        <h1 className="text-4xl font-extrabold tracking-tight">
-          Marketplace de NFTs GreenMint
-        </h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">
-          Explore, colecione e negocie NFTs exclusivos com liquidez e tempo real.
-        </p>
-        <div className="pt-4 flex justify-center gap-4">
-          <Button>Explorar Coleção</Button>
-          <Button variant="outline">Conhecer Mais</Button>
-        </div>
-      </div>
-    );
-  },
+  path: '/login',
+  component: LoginPage,
+  validateSearch: (s: Record<string, unknown>): { redirect?: string; expired?: boolean } => ({
+    redirect: typeof s.redirect === 'string' ? s.redirect : undefined,
+    expired: s.expired === 1 || s.expired === '1' || s.expired === true ? true : undefined,
+  }),
 });
 
-const routeTree = rootRoute.addChildren([indexRoute]);
+const routeTree = rootRoute.addChildren([
+  indexRoute, nftRoute, cartRoute, checkoutRoute, orderRoute, profileRoute, walletsRoute, registerRoute, loginRoute,
+]);
 
 export const router = createRouter({ routeTree });
 

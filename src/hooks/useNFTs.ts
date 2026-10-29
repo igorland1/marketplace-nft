@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { nftService } from '@/services/api';
 import { NFTFilterParams, NFTItem } from '@/types';
 
@@ -12,7 +12,8 @@ export function useNFTs(params?: NFTFilterParams) {
   return useQuery({
     queryKey: NFT_QUERY_KEYS.list(params),
     queryFn: ({ signal }) => nftService.getAll(params, signal),
-    staleTime: 1000 * 30, // 30 seconds
+    staleTime: 1000 * 30,
+    placeholderData: keepPreviousData,
   });
 }
 
