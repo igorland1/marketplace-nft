@@ -61,7 +61,19 @@ export const INITIAL_COUPONS: AppliedCoupon[] = [
     expiresAt: '2027-12-31T23:59:59.000Z',
   },
   {
+    code: 'GREEN10',
+    discountPercentage: 10,
+    maxDiscountEth: '0.500',
+    expiresAt: '2027-12-31T23:59:59.000Z',
+  },
+  {
     code: 'NFTVIP20',
+    discountPercentage: 20,
+    maxDiscountEth: '1.000',
+    expiresAt: '2027-12-31T23:59:59.000Z',
+  },
+  {
+    code: 'VIP20',
     discountPercentage: 20,
     maxDiscountEth: '1.000',
     expiresAt: '2027-12-31T23:59:59.000Z',

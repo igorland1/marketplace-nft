@@ -42,14 +42,15 @@ O ambiente de simulação MSW inclui contas de colecionador pré-configuradas e 
 
 | Nome | E-mail | Senha | Perfil & Dados |
 | --- | --- | --- | --- |
-| **Satoshi Nakamoto** | `satoshi@greenmint.io` | `senha123` | Colecionador verificado, 2 carteiras vinculadas, histórico de pedidos e itens favoritos |
-| **Elena Rostova** | `elena@greenmint.io` | `senha123` | Colecionadora verificada, carteira secundária e preferências personalizadas |
+| **Satoshi Nakamoto** | `satoshi@greenmint.io` | `password123` (ou `senha123`) | Colecionador verificado, 2 carteiras vinculadas, histórico de pedidos e itens favoritos |
+| **Elena Rostova** | `elena@greenmint.io` | `password123` (ou `senha123`) | Colecionadora verificada, carteira secundária e preferências personalizadas |
 
 > **Nota**: Novos cadastros podem ser efetuados livremente na tela `/register`. A aplicação persiste dados no `localStorage` e pode ser resetada a qualquer momento através do endpoint `POST /api/test/reset`.
 
 ### Cupons de Desconto Disponíveis no Carrinho
-- `GREEN10`: 10% de desconto sobre o subtotal.
-- `VIP20`: 20% de desconto sobre o subtotal.
+- `GREENMINT10` (ou `GREEN10`): 10% de desconto sobre o subtotal.
+- `NFTVIP20` (ou `VIP20`): 20% de desconto sobre o subtotal.
+- `EXPIRED50`: Cupom expirado para testar feedback e tratamento de erro.
 
 ---
 

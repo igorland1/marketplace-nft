@@ -39,10 +39,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
+    // Challenge requirement: clear any prior session cache to avoid data leakage between users
+    queryClient.clear();
     const data = await authService.login({ email, password });
     localStorage.setItem('greenmint_auth_token', data.token);
     setUser(data.user);
-    // Invalidate user queries to fetch fresh session data
     queryClient.invalidateQueries();
   };
 
@@ -52,6 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     email: string;
     password: string;
   }) => {
+    queryClient.clear();
     const data = await authService.register(formData);
     localStorage.setItem('greenmint_auth_token', data.token);
     setUser(data.user);
