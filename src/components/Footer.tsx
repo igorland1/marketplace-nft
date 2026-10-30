@@ -120,10 +120,10 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <span className="cursor-not-allowed opacity-60">Atividade</span>
+                <span className="cursor-not-allowed text-muted-foreground/90">Atividade</span>
               </li>
               <li>
-                <span className="cursor-not-allowed opacity-60">Estúdio do criador</span>
+                <span className="cursor-not-allowed text-muted-foreground/90">Estúdio do criador</span>
               </li>
               <li>
                 <Link to="/profile" className="hover:text-foreground transition-colors">
@@ -138,19 +138,19 @@ export function Footer() {
             <h4 className="font-semibold text-foreground">Central de ajuda</h4>
             <ul className="space-y-2 text-muted-foreground">
               <li>
-                <span className="cursor-not-allowed opacity-60">Central de ajuda</span>
+                <span className="cursor-not-allowed text-muted-foreground/90">Central de ajuda</span>
               </li>
               <li>
-                <span className="cursor-not-allowed opacity-60">Como comprar NFTs</span>
+                <span className="cursor-not-allowed text-muted-foreground/90">Como comprar NFTs</span>
               </li>
               <li>
-                <span className="cursor-not-allowed opacity-60">Carteira e segurança</span>
+                <span className="cursor-not-allowed text-muted-foreground/90">Carteira e segurança</span>
               </li>
               <li>
-                <span className="cursor-not-allowed opacity-60">Política do mercado</span>
+                <span className="cursor-not-allowed text-muted-foreground/90">Política do mercado</span>
               </li>
               <li>
-                <span className="cursor-not-allowed opacity-60">Denunciar item</span>
+                <span className="cursor-not-allowed text-muted-foreground/90">Denunciar item</span>
               </li>
             </ul>
           </div>
