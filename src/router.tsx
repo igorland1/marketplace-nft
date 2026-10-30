@@ -63,7 +63,14 @@ const checkoutRoute = createRoute({ getParentRoute: () => rootRoute, path: '/che
 const orderRoute = createRoute({ getParentRoute: () => rootRoute, path: '/orders/$id', component: OrderPage, beforeLoad: requireAuth });
 const profileRoute = createRoute({ getParentRoute: () => rootRoute, path: '/profile', component: ProfilePage, beforeLoad: requireAuth });
 const walletsRoute = createRoute({ getParentRoute: () => rootRoute, path: '/wallets', component: WalletsPage, beforeLoad: requireAuth });
-const registerRoute = createRoute({ getParentRoute: () => rootRoute, path: '/register', component: RegisterPage });
+const registerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/register',
+  component: RegisterPage,
+  validateSearch: (s: Record<string, unknown>): { redirect?: string } => ({
+    redirect: typeof s.redirect === 'string' ? s.redirect : undefined,
+  }),
+});
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',

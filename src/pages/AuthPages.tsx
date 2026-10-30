@@ -141,6 +141,7 @@ export function LoginPage() {
           </button>
           <Link
             to="/register"
+            search={search.redirect ? { redirect: search.redirect } : undefined}
             className="text-lg font-medium text-muted-foreground hover:text-foreground pb-1 px-1 transition-all"
           >
             Criar conta
@@ -302,6 +303,7 @@ export function LoginPage() {
 
 export function RegisterPage() {
   const { register, login } = useAuth();
+  const search = useSearch({ from: '/register' });
   const navigate = useNavigate();
   const [f, setF] = useState({
     name: '',
@@ -321,12 +323,12 @@ export function RegisterPage() {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        navigate({ to: '/' });
+        navigate({ to: safeRedirect(search.redirect) });
       }
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [navigate]);
+  }, [navigate, search.redirect]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -361,7 +363,7 @@ export function RegisterPage() {
         email: f.email.trim(),
         password: f.password,
       });
-      navigate({ to: '/' });
+      navigate({ to: safeRedirect(search.redirect) });
     } catch (err) {
       setFormError(errorMessage(err));
     } finally {
@@ -375,7 +377,7 @@ export function RegisterPage() {
     try {
       // Demo mock login
       await login('satoshi@greenmint.io', 'password123');
-      navigate({ to: '/' });
+      navigate({ to: safeRedirect(search.redirect) });
     } catch (err) {
       setFormError(`Falha ao conectar com ${provider}: ${errorMessage(err)}`);
     } finally {
@@ -384,7 +386,7 @@ export function RegisterPage() {
   }
 
   function handleClose() {
-    navigate({ to: '/' });
+    navigate({ to: safeRedirect(search.redirect) });
   }
 
   return (
@@ -412,6 +414,7 @@ export function RegisterPage() {
         <div className="flex items-center justify-center gap-6 pt-1">
           <Link
             to="/login"
+            search={search.redirect ? { redirect: search.redirect } : {}}
             className="text-lg font-medium text-muted-foreground hover:text-foreground pb-1 px-1 transition-all"
           >
             Entrar
@@ -601,7 +604,11 @@ export function RegisterPage() {
 
         <p className="text-center text-xs text-muted-foreground pt-1">
           Já tem conta?{' '}
-          <Link to="/login" search={{}} className="text-primary hover:underline font-semibold">
+          <Link
+            to="/login"
+            search={search.redirect ? { redirect: search.redirect } : {}}
+            className="text-primary hover:underline font-semibold"
+          >
             Entrar
           </Link>
         </p>

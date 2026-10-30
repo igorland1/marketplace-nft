@@ -16,6 +16,12 @@ export function Header({ isLive }: { isLive: boolean }) {
   const location = useLocation();
   const count = cart?.items.reduce((n, i) => n + i.quantity, 0) ?? 0;
 
+  const currentPath = location.pathname + (location.searchStr ?? '');
+  const loginSearch =
+    location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register'
+      ? { redirect: currentPath }
+      : {};
+
   const urlQ = ((location.search as Record<string, unknown>)?.q as string) || '';
   const [isSearchOpenExplicit, setIsSearchOpenExplicit] = useState(false);
   const [localQuery, setLocalQuery] = useState<string | null>(null);
@@ -140,7 +146,7 @@ export function Header({ isLive }: { isLive: boolean }) {
             ) : (
               <Link
                 to="/login"
-                search={{}}
+                search={loginSearch}
                 className="hidden items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors md:inline-flex"
               >
                 <LogIn className="h-3.5 w-3.5" aria-hidden /> Entrar
@@ -159,7 +165,7 @@ export function Header({ isLive }: { isLive: boolean }) {
         {user ? (
           <button onClick={doLogout} aria-label="Sair" className="p-2"><LogOut className="h-5 w-5" /></button>
         ) : (
-          <Link to="/login" search={{}} aria-label="Entrar" className="p-2" activeProps={{ className: 'text-primary' }}><UserIcon className="h-5 w-5" /></Link>
+          <Link to="/login" search={loginSearch} aria-label="Entrar" className="p-2" activeProps={{ className: 'text-primary' }}><UserIcon className="h-5 w-5" /></Link>
         )}
       </nav>
     </>
