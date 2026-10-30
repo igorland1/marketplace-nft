@@ -46,6 +46,7 @@ export const profileHandlers = [
     const body = (await request.json()) as {
       name?: string;
       username?: string;
+      email?: string;
       bio?: string;
       avatarUrl?: string;
     };

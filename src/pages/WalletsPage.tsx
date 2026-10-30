@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { errorMessage } from '@/lib/format';
 import { NetworkType, Wallet } from '@/types';
+import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
 
 function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void }) {
   const save = useSaveWallet();
@@ -57,26 +58,68 @@ export function WalletsPage() {
   const [editing, setEditing] = useState<Wallet | 'new' | null>(null);
 
   return (
-    <div className="mx-auto max-w-lg space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Carteiras</h1>
-        {!editing && <Button onClick={() => setEditing('new')}>Adicionar carteira</Button>}
+    <div className="mx-auto max-w-7xl min-h-[calc(100vh-14rem)] px-4 py-8 md:px-8 md:py-12">
+      <div className="flex flex-col items-start gap-8 lg:flex-row lg:gap-12">
+        {/* Left Sidebar */}
+        <aside className="w-full shrink-0 lg:w-72">
+          <ProfileSidebar activeItem="wallets" />
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0 max-w-4xl space-y-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+              Carteiras
+            </h1>
+            {!editing && (
+              <Button onClick={() => setEditing('new')} className="font-semibold">
+                Adicionar carteira
+              </Button>
+            )}
+          </div>
+
+          {editing && (
+            <WalletForm
+              key={editing === 'new' ? 'new' : editing.id}
+              wallet={editing === 'new' ? undefined : editing}
+              onDone={() => setEditing(null)}
+            />
+          )}
+
+          {isLoading ? (
+            <Skeleton className="h-32 w-full rounded-lg" />
+          ) : (
+            <ul className="space-y-3">
+              {wallets?.map((w) => (
+                <li
+                  key={w.id}
+                  className="flex items-center justify-between rounded-xl border border-border/80 bg-card p-4 shadow-sm"
+                >
+                  <div className="text-sm space-y-1">
+                    <p className="font-semibold text-foreground flex items-center gap-2">
+                      <span>{w.label}</span>{' '}
+                      {w.isPrimary ? (
+                        <Badge tone="success">Principal</Badge>
+                      ) : (
+                        <Badge>Secundária</Badge>
+                      )}
+                    </p>
+                    <p className="text-xs font-mono text-muted-foreground">
+                      {w.address} · {w.network} · {w.balanceEth} ETH
+                    </p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => setEditing(w)}>
+                    Editar
+                  </Button>
+                </li>
+              ))}
+              {wallets?.length === 0 && (
+                <li className="text-sm text-muted-foreground">Nenhuma carteira cadastrada.</li>
+              )}
+            </ul>
+          )}
+        </main>
       </div>
-      {editing && <WalletForm key={editing === 'new' ? 'new' : editing.id} wallet={editing === 'new' ? undefined : editing} onDone={() => setEditing(null)} />}
-      {isLoading ? <Skeleton className="h-32" /> : (
-        <ul className="space-y-2">
-          {wallets?.map((w) => (
-            <li key={w.id} className="flex items-center justify-between rounded-lg border p-3">
-              <div className="text-sm">
-                <p className="font-semibold">{w.label} {w.isPrimary ? <Badge tone="success">Principal</Badge> : <Badge>Secundária</Badge>}</p>
-                <p className="text-muted-foreground">{w.address} · {w.network} · {w.balanceEth} ETH</p>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => setEditing(w)}>Editar</Button>
-            </li>
-          ))}
-          {wallets?.length === 0 && <li className="text-sm text-muted-foreground">Nenhuma carteira cadastrada.</li>}
-        </ul>
-      )}
     </div>
   );
 }
