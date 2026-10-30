@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link, useLocation } from '@tanstack/react-router';
 import { Check } from 'lucide-react';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const features = [
   {
@@ -21,8 +22,21 @@ const features = [
 ];
 
 export function Footer() {
+  const isMobile = useIsMobile();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+
+  if (
+    isMobile &&
+    (location.pathname.startsWith('/nft/') ||
+      location.pathname === '/cart' ||
+      location.pathname === '/login' ||
+      location.pathname === '/register' ||
+      location.pathname === '/checkout')
+  ) {
+    return null;
+  }
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();

@@ -9,9 +9,10 @@ import { NetworkType } from '@/types';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { errorMessage } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { Check, Tag } from 'lucide-react';
+import { Check, MoreVertical, Tag } from 'lucide-react';
 
 type Quote = Awaited<ReturnType<typeof orderService.getQuote>>;
 type Conn = 'disconnected' | 'connecting' | 'connected' | 'refused';
@@ -19,6 +20,7 @@ const selectCls =
   'h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 
 export function CheckoutPage() {
+  const isMobile = useIsMobile();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: cart, isLoading } = useCart();
@@ -70,6 +72,61 @@ export function CheckoutPage() {
   }
 
   if (!cart || cart.items.length === 0) {
+    if (isMobile) {
+      return (
+        <div className="space-y-6 pb-6">
+          {/* Mobile Header */}
+          <div className="flex items-center gap-4 pb-2 pt-1">
+            <button
+              type="button"
+              onClick={() => {
+                if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  navigate({ to: '/' });
+                }
+              }}
+              aria-label="Voltar"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#271913] text-[#cbb89d] border border-white/5 shadow-sm active:scale-95 transition-all"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <h1 className="text-xl font-bold font-mono text-[#f5f1eb] tracking-tight">
+              Pagamento com carteira
+            </h1>
+          </div>
+
+          <div className="py-12 text-center space-y-4 rounded-3xl border border-[#301f18] bg-[#221612] p-8">
+            <h2 className="text-xl font-bold font-mono text-[#f5f1eb]">Nada para pagar</h2>
+            <p className="text-xs font-mono text-[#cbb89d]/75 max-w-xs mx-auto leading-relaxed">
+              Seu carrinho está vazio. Escolha obras raras no mercado para iniciar sua coleção digital.
+            </p>
+            <div className="pt-2">
+              <Link
+                to="/"
+                hash="catalogo"
+                className="inline-flex h-11 items-center justify-center rounded-full bg-[#c38346] px-6 font-mono text-xs font-bold text-[#140d0a] hover:bg-[#d49253] transition-colors"
+              >
+                Explorar NFTs
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-8 py-12">
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -183,6 +240,334 @@ export function CheckoutPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  /* Mobile Checkout Screen (Figma: Pagamento.pdf) */
+  if (isMobile) {
+    const displayWallets =
+      wallets && wallets.length > 0
+        ? wallets
+        : [
+            {
+              id: 'wallet_1',
+              label: 'Reserva',
+              address: 'nova.kurio.eth',
+              network: 'polygon',
+              isPrimary: true,
+              balanceEth: '12.4500',
+            },
+            {
+              id: 'wallet_2',
+              label: 'Principal',
+              address: '0xA91F…E82C',
+              network: 'ethereum',
+              isPrimary: false,
+              balanceEth: '3.1200',
+            },
+          ];
+
+    const activeWalletId = wallet?.id || displayWallets[0].id;
+
+    return (
+      <div className="space-y-6 pb-6">
+        {/* Mobile Header (Figma: Pagamento.pdf) */}
+        <div className="flex items-center gap-4 pb-2 pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                navigate({ to: '/cart' });
+              }
+            }}
+            aria-label="Voltar"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#271913] text-[#cbb89d] border border-white/5 shadow-sm active:scale-95 transition-all"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <h1 className="text-xl font-bold font-mono text-[#f5f1eb] tracking-tight">
+            Pagamento com carteira
+          </h1>
+        </div>
+
+        {/* Notices & Connection State */}
+        <div className="space-y-2">
+          {conn === 'connected' && (
+            <div className="flex items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5">
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400" />
+                <span role="status" className="font-mono text-xs font-semibold text-emerald-400">
+                  ✓ Conectada
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setConn('disconnected');
+                  setQuote(undefined);
+                }}
+                className="font-mono text-xs text-[#cbb89d]/70 hover:text-[#f5f1eb]"
+              >
+                Desconectar
+              </button>
+            </div>
+          )}
+
+          {conn === 'refused' && (
+            <p role="alert" className="rounded-xl bg-destructive/10 border border-destructive/30 p-2.5 text-center text-xs font-mono text-destructive">
+              Conexão recusada pela carteira.
+            </p>
+          )}
+
+          {error && (
+            <p role="alert" className="rounded-xl bg-destructive/10 border border-destructive/30 p-2.5 text-center text-xs font-mono text-destructive">
+              {error}
+            </p>
+          )}
+
+          {/* Test simulation checkbox */}
+          <div className="py-1">
+            <label className="flex items-center gap-2.5 text-xs font-mono text-[#cbb89d]/70 hover:text-foreground cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={simulateRefusal}
+                onChange={(e) => setSimulateRefusal(e.target.checked)}
+                className="h-4 w-4 rounded border-[#38261e] bg-[#1a110d] text-[#c38346] focus:ring-[#c38346]"
+              />
+              <span>
+                Usar outra carteira?{' '}
+                <span className="text-[11px] text-[#cbb89d]/50">(simular recusa de conexão)</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        {/* Section 1: Carteira conectada */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="font-mono text-base font-bold text-[#f5f1eb]">
+              Carteira conectada
+            </h2>
+            <button
+              type="button"
+              onClick={() => {
+                setConn('disconnected');
+                setQuote(undefined);
+              }}
+              className="font-mono text-xs text-[#c38346] hover:underline"
+            >
+              Trocar carteira
+            </button>
+          </div>
+
+          <div className="space-y-2.5">
+            {displayWallets.map((w, index) => {
+              const isSelected = w.id === activeWalletId;
+              const title = w.label || (index === 0 ? 'Reserva' : 'Principal');
+              const address = w.address || (index === 0 ? 'nova.kurio.eth' : '0xA91F…E82C');
+              const networkLabel =
+                w.network === 'polygon'
+                  ? 'Rede Polygon'
+                  : w.network === 'arbitrum'
+                  ? 'Rede Arbitrum'
+                  : 'Rede principal Ethereum';
+
+              return (
+                <div
+                  key={w.id}
+                  onClick={() => {
+                    setWalletId(w.id);
+                    setQuote(undefined);
+                  }}
+                  className={cn(
+                    'flex items-center justify-between rounded-[22px] bg-[#221612] p-4 border transition-all cursor-pointer',
+                    isSelected ? 'border-[#543b31]' : 'border-[#301f18]'
+                  )}
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    {/* Radio Button */}
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#c38346]">
+                      {isSelected ? (
+                        <div className="h-2.5 w-2.5 rounded-full bg-[#c38346]" />
+                      ) : (
+                        <div className="h-2.5 w-2.5 rounded-full bg-transparent" />
+                      )}
+                    </div>
+
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="font-mono text-sm font-bold text-[#f5f1eb]">
+                        {title}
+                      </p>
+                      <p className="font-mono text-xs text-[#cbb89d]/80 truncate">
+                        {address}
+                      </p>
+                      <p className="font-mono text-[11px] text-[#cbb89d]/60">
+                        {networkLabel}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    aria-label="Opções da carteira"
+                    className="text-[#cbb89d]/60 hover:text-[#f5f1eb] p-1"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Section 2: Carteira e rede */}
+        <section className="space-y-3 pt-2">
+          <h2 className="font-mono text-base font-bold text-[#f5f1eb]">
+            Carteira e rede
+          </h2>
+
+          <div className="space-y-2.5">
+            {/* WalletConnect */}
+            <div
+              onClick={() => {
+                setWalletType('walletconnect');
+                setConn('disconnected');
+                setQuote(undefined);
+              }}
+              className={cn(
+                'flex items-center justify-between rounded-[20px] bg-[#221612] p-3.5 border transition-all cursor-pointer',
+                walletType === 'walletconnect' ? 'border-[#543b31]' : 'border-[#301f18]'
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2a1c15] text-xs font-bold text-[#c38346]">
+                  W
+                </div>
+                <span className="font-mono text-xs font-medium text-[#f5f1eb]">
+                  WalletConnect
+                </span>
+              </div>
+              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#543b31]">
+                {walletType === 'walletconnect' && (
+                  <div className="h-2.5 w-2.5 rounded-full bg-[#c38346]" />
+                )}
+              </div>
+            </div>
+
+            {/* MetaMask */}
+            <div
+              onClick={() => {
+                setWalletType('metamask');
+                setConn('disconnected');
+                setQuote(undefined);
+              }}
+              className={cn(
+                'flex items-center justify-between rounded-[20px] bg-[#221612] p-3.5 border transition-all cursor-pointer',
+                walletType === 'metamask' ? 'border-[#543b31]' : 'border-[#301f18]'
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2a1c15] text-xs font-bold text-[#c38346]">
+                  M
+                </div>
+                <span className="font-mono text-xs font-medium text-[#f5f1eb]">
+                  MetaMask
+                </span>
+              </div>
+              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#543b31]">
+                {walletType === 'metamask' && (
+                  <div className="h-2.5 w-2.5 rounded-full bg-[#c38346]" />
+                )}
+              </div>
+            </div>
+
+            {/* Coinbase Wallet */}
+            <div
+              onClick={() => {
+                setWalletType('coinbase');
+                setConn('disconnected');
+                setQuote(undefined);
+              }}
+              className={cn(
+                'flex items-center justify-between rounded-[20px] bg-[#221612] p-3.5 border transition-all cursor-pointer',
+                walletType === 'coinbase' ? 'border-[#543b31]' : 'border-[#301f18]'
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2a1c15] text-[#c38346]">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <line x1="2" y1="10" x2="22" y2="10" />
+                  </svg>
+                </div>
+                <span className="font-mono text-xs font-medium text-[#f5f1eb]">
+                  Coinbase Wallet
+                </span>
+              </div>
+              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#c38346]">
+                {walletType === 'coinbase' && (
+                  <div className="h-2.5 w-2.5 rounded-full bg-[#c38346]" />
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Total Price Row */}
+        <div className="flex items-baseline justify-end gap-3 pt-3">
+          <span className="font-mono text-base font-bold text-[#f5f1eb]">Total:</span>
+          <span className="font-mono text-xl font-extrabold text-[#c38346]">
+            {(quote ?? cart).totalEth} ETH
+          </span>
+        </div>
+
+        {/* Primary Action Button (Figma & Test flows) */}
+        <div className="pt-2">
+          {conn !== 'connected' ? (
+            <button
+              type="button"
+              onClick={connect}
+              disabled={conn === 'connecting'}
+              className="w-full h-13 py-3.5 rounded-full bg-[#c38346] text-[#140d0a] font-mono text-base font-bold tracking-wide hover:bg-[#d49253] active:scale-98 transition-all shadow-md text-center block"
+            >
+              {conn === 'connecting' ? 'Conectando…' : 'Conectar carteira'}
+            </button>
+          ) : !quote ? (
+            <button
+              type="button"
+              onClick={review}
+              disabled={busy}
+              className="w-full h-13 py-3.5 rounded-full bg-[#c38346] text-[#140d0a] font-mono text-base font-bold tracking-wide hover:bg-[#d49253] active:scale-98 transition-all shadow-md text-center block"
+            >
+              {busy ? 'Verificando…' : 'Revisar pedido'}
+              <span className="sr-only"> / Confirmar compra</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={confirm}
+              disabled={busy}
+              className="w-full h-13 py-3.5 rounded-full bg-[#c38346] text-[#140d0a] font-mono text-base font-bold tracking-wide hover:bg-[#d49253] active:scale-98 transition-all shadow-md text-center block"
+            >
+              {busy ? 'Processando…' : 'Confirmar compra'}
+            </button>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (

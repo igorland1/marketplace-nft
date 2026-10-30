@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useNFTs } from '@/hooks/useNFTs';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { NFTCard } from '@/components/NFTCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -94,6 +95,7 @@ const TABS: { label: string; sort: CatalogSearch['sort'] }[] = [
 ];
 
 export function HomePage() {
+  const isMobile = useIsMobile();
   const search = useSearch({ from: '/' });
   const navigate = useNavigate({ from: '/' });
 
@@ -127,50 +129,159 @@ export function HomePage() {
   const grid = 'grid grid-cols-2 gap-4 lg:grid-cols-3';
 
   return (
-    <div className="space-y-16">
-      {/* Hero Section (Figma Desktop: Início) */}
-      <section aria-labelledby="hero-title" className="grid items-center gap-8 py-6 md:grid-cols-2">
-        <div className="space-y-4">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Bem-vindo à Kurio</p>
-          <h1 id="hero-title" className="text-3xl font-extrabold uppercase leading-tight tracking-tight md:text-5xl">
-            Seja dono do futuro<br />da arte digital
-          </h1>
-          <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
-            Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital rara, apoie artistas e tenha uma parte da cultura da internet.
-          </p>
-          <div className="pt-2">
-            <a
-              href="#catalogo"
-              className="inline-flex h-9 items-center rounded-md bg-primary px-7 text-xs font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-colors"
+    <div className={isMobile ? "space-y-6" : "space-y-16"}>
+      {isMobile ? (
+        /* Mobile Hero (Figma: Início.pdf) */
+        <section aria-labelledby="hero-title-mobile">
+          <div className="relative overflow-hidden rounded-[30px] bg-[#221612] p-5 pb-7 shadow-xl">
+            {/* Background mask group from Figma Mask Group.svg */}
+            <svg
+              className="pointer-events-none absolute inset-0 h-full w-full"
+              viewBox="0 0 366 190"
+              preserveAspectRatio="none"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
             >
-              Explorar
-            </a>
-          </div>
-        </div>
+              <rect width="366" height="190" rx="30" fill="url(#paint0_linear_14_5290)" />
+              <mask id="mask0_14_5290" style={{ maskType: 'alpha' }} maskUnits="userSpaceOnUse" x="0" y="0" width="366" height="190">
+                <rect width="366" height="190" rx="30" fill="#EDEDED" />
+              </mask>
+              <g mask="url(#mask0_14_5290)">
+                <circle cx="44" cy="93" r="124" fill="url(#paint1_linear_14_5290)" />
+                <circle cx="197" cy="114" r="124" fill="url(#paint2_linear_14_5290)" />
+              </g>
+              <defs>
+                <linearGradient id="paint0_linear_14_5290" x1="5" y1="-5.5613e-06" x2="366" y2="183" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#D28A4C" stopOpacity="0.2" />
+                  <stop offset="1" stopColor="#D28A4C" stopOpacity="0.1" />
+                </linearGradient>
+                <linearGradient id="paint1_linear_14_5290" x1="69" y1="-9.99999" x2="139" y2="185" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#DD9A5F" stopOpacity="0.43" />
+                  <stop offset="1" stopColor="#D28A4C" stopOpacity="0.04" />
+                </linearGradient>
+                <linearGradient id="paint2_linear_14_5290" x1="222" y1="11" x2="292" y2="206" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#DD9A5F" stopOpacity="0.37" />
+                  <stop offset="1" stopColor="#D28A4C" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+            </svg>
 
-        <div className="relative flex flex-col items-center">
-          <img
-            src="/figma/hero-ape.jpg"
-            alt="Emerald Ape, arte em destaque"
-            width={720}
-            height={720}
-            {...{ fetchpriority: 'high' }}
-            className="aspect-square w-full max-w-md rounded-xl object-cover shadow-2xl"
-          />
-          {/* Carousel dots from Figma */}
-          <div className="mt-4 flex items-center justify-center gap-2">
-            <span className="h-2 w-6 rounded-full bg-primary" />
-            <span className="h-2 w-2 rounded-full bg-muted transition-colors" />
-            <span className="h-2 w-2 rounded-full bg-muted transition-colors" />
-            <span className="h-2 w-2 rounded-full bg-muted transition-colors" />
+            <div className="relative flex items-center justify-between gap-2">
+              {/* Left text column */}
+              <div className="flex-1 space-y-2 pr-1">
+                <p className="font-mono text-xs font-semibold text-[#f5f1eb]/95">
+                  Bem-vindo à Kurio
+                </p>
+
+                <h1 id="hero-title-mobile" className="text-[17px] font-extrabold uppercase leading-tight tracking-tight text-white font-mono">
+                  SEJA DONO DA<br />CULTURA DIGITAL
+                </h1>
+
+                <p className="text-[11px] leading-snug text-[#cbb89d] font-mono">
+                  Descubra NFTs selecionados de criadores do mundo todo.
+                </p>
+
+                <div className="pt-1">
+                  <a
+                    href="#catalogo"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#d28a4c] hover:text-[#e09b5c] transition-colors font-mono"
+                  >
+                    EXPLORAR <span>→</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Right artwork layered stack */}
+              <div className="relative w-[115px] sm:w-[130px] shrink-0 self-center">
+                {/* Main image */}
+                <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-[#dfdabc] shadow-lg">
+                  <img
+                    src="/figma/hero-ape.jpg"
+                    alt="Emerald Ape"
+                    width={180}
+                    height={225}
+                    {...{ fetchpriority: 'high' }}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                {/* Overlapping mini card bottom-left */}
+                <div className="absolute -bottom-1.5 -left-3 h-12 w-12 overflow-hidden rounded-xl border-2 border-[#dfdabc] bg-[#eee7d3] shadow-md">
+                  <img
+                    src="/nfts/art-2.webp"
+                    alt="Sage Nomad"
+                    width={60}
+                    height={60}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Pagination dots inside card at bottom (Figma: Início.pdf) */}
+            <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#d28a4c]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#d28a4c]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#d28a4c]" />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : (
+        /* Desktop Hero Section (Figma Desktop: Início) */
+        <section aria-labelledby="hero-title" className="grid items-center gap-8 py-6 md:grid-cols-2">
+          <div className="space-y-4">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Bem-vindo à Kurio</p>
+            <h1 id="hero-title" className="text-3xl font-extrabold uppercase leading-tight tracking-tight md:text-5xl">
+              Seja dono do futuro<br />da arte digital
+            </h1>
+            <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
+              Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital rara, apoie artistas e tenha uma parte da cultura da internet.
+            </p>
+            <div className="pt-2">
+              <a
+                href="#catalogo"
+                className="inline-flex h-9 items-center rounded-md bg-primary px-7 text-xs font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                Explorar
+              </a>
+            </div>
+          </div>
+
+          <div className="relative flex flex-col items-center">
+            <img
+              src="/figma/hero-ape.jpg"
+              alt="Emerald Ape, arte em destaque"
+              width={720}
+              height={720}
+              {...{ fetchpriority: 'high' }}
+              className="aspect-square w-full max-w-md rounded-xl object-cover shadow-2xl"
+            />
+            {/* Carousel dots from Figma */}
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <span className="h-2 w-6 rounded-full bg-primary" />
+              <span className="h-2 w-2 rounded-full bg-muted transition-colors" />
+              <span className="h-2 w-2 rounded-full bg-muted transition-colors" />
+              <span className="h-2 w-2 rounded-full bg-muted transition-colors" />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Catalog & Filters Section (Figma) */}
-      <div id="catalogo" className="grid scroll-mt-6 gap-8 lg:grid-cols-[240px_1fr]">
+      <div
+        id="catalogo"
+        className={isMobile ? "flex flex-col scroll-mt-6 gap-8" : "grid scroll-mt-6 gap-8 lg:grid-cols-[240px_1fr]"}
+      >
         {/* Left Sidebar Filters */}
-        <aside aria-label="Filtros" className="h-fit space-y-6 rounded-xl border border-border bg-card p-5 text-xs">
+        <aside
+          id="filtros"
+          aria-label="Filtros"
+          className={
+            isMobile
+              ? "order-2 h-fit space-y-6 rounded-xl border border-border bg-card p-5 text-xs"
+              : "h-fit space-y-6 rounded-xl border border-border bg-card p-5 text-xs"
+          }
+        >
           {/* Coleções */}
           <div>
             <h2 className="mb-3 text-sm font-semibold text-foreground">Coleções</h2>
@@ -285,37 +396,66 @@ export function HomePage() {
         </aside>
 
         {/* Right Catalog Main Section */}
-        <section aria-labelledby="catalogo-title" className="min-w-0 space-y-4">
+        <section
+          aria-labelledby="catalogo-title"
+          className={isMobile ? "order-1 min-w-0 space-y-4" : "min-w-0 space-y-4"}
+        >
           <h2 id="catalogo-title" className="sr-only">Catálogo</h2>
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-1">
-            <div role="tablist" aria-label="Seções do catálogo" className="flex gap-4 text-xs">
-              {TABS.map((t) => (
-                <button
-                  key={t.label}
-                  role="tab"
-                  aria-selected={search.sort === t.sort}
-                  onClick={() => update({ sort: t.sort })}
-                  className={`border-b-2 py-2 font-medium transition-colors ${search.sort === t.sort ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-                >
-                  {t.label}
-                </button>
-              ))}
+
+          {isMobile ? (
+            /* Mobile Category Tabs (Figma: Início.pdf) */
+            <div role="tablist" aria-label="Seções do catálogo" className="flex items-center gap-5 text-xs font-mono">
+              {TABS.map((t) => {
+                const isActive = search.sort === t.sort;
+                return (
+                  <button
+                    key={t.label}
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => update({ sort: t.sort })}
+                    className={`pb-1 transition-colors ${
+                      isActive
+                        ? 'border-b-2 border-[#d28a4c] font-bold text-[#f5f1eb]'
+                        : 'border-b-2 border-transparent text-[#9e8e7e] hover:text-[#f5f1eb]'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
             </div>
-            <label className="flex items-center gap-2 text-xs text-muted-foreground">
-              Ordenar por:
-              <select
-                aria-label="Ordenar por"
-                className={selectCls}
-                value={search.sort ?? 'recent'}
-                onChange={(e) => update({ sort: e.target.value as CatalogSearch['sort'] })}
-              >
-                <option value="recent">Listados recentemente</option>
-                <option value="price_asc">Menor preço</option>
-                <option value="price_desc">Maior preço</option>
-                <option value="likes">Mais curtidos</option>
-              </select>
-            </label>
-          </div>
+          ) : (
+            /* Desktop Tabs & Sort Header */
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-1">
+              <div role="tablist" aria-label="Seções do catálogo" className="flex gap-4 text-xs">
+                {TABS.map((t) => (
+                  <button
+                    key={t.label}
+                    role="tab"
+                    aria-selected={search.sort === t.sort}
+                    onClick={() => update({ sort: t.sort })}
+                    className={`border-b-2 py-2 font-medium transition-colors ${search.sort === t.sort ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                Ordenar por:
+                <select
+                  aria-label="Ordenar por"
+                  className={selectCls}
+                  value={search.sort ?? 'recent'}
+                  onChange={(e) => update({ sort: e.target.value as CatalogSearch['sort'] })}
+                >
+                  <option value="recent">Listados recentemente</option>
+                  <option value="price_asc">Menor preço</option>
+                  <option value="price_desc">Maior preço</option>
+                  <option value="likes">Mais curtidos</option>
+                </select>
+              </label>
+            </div>
+          )}
 
           {isError ? (
             <div role="alert" className="rounded-lg border border-destructive/40 p-6 text-center">

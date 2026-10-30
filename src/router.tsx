@@ -21,7 +21,7 @@ function RootLayout() {
   return (
     <div className="flex min-h-screen flex-col bg-background font-mono text-foreground">
       <Header isLive={isConnected} />
-      <main className="mx-auto w-full max-w-[1200px] flex-1 p-4">
+      <main className="mx-auto w-full max-w-[1200px] flex-1 px-4 pt-3 pb-24 md:p-4 md:pb-8">
         <Outlet />
       </main>
       <Footer />

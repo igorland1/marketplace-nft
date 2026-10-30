@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
-import { Check, Copy, Heart, Share2, Star } from 'lucide-react';
+import { Check, Copy, Heart, Share2, ShoppingCart, Star } from 'lucide-react';
 import axios from 'axios';
 import { useNFTDetail, useNFTs, useToggleFavorite } from '@/hooks/useNFTs';
 import { useAddToCart, useCart } from '@/hooks/useCart';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,6 +40,7 @@ const REVIEWS = [
 ];
 
 export function NFTDetailPage() {
+  const isMobile = useIsMobile();
   const { id } = useParams({ from: '/nft/$id' });
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -140,6 +142,221 @@ export function NFTDetailPage() {
   };
 
   const relatedNFTs = moreNfts?.data.filter((n) => n.id !== nft.id).slice(0, 5) ?? [];
+
+  if (isMobile) {
+    return (
+      <div className="-mx-4 -mt-3 -mb-24 flex min-h-screen flex-col bg-[#140D0A] font-mono text-[#F5F1EB]">
+        {/* Top Section (Header buttons + Artwork image) with top gradient */}
+        <div
+          className="relative px-5 pt-3 pb-8"
+          style={{
+            background: 'linear-gradient(135deg, #241612 0%, #2F1D15 100%)',
+          }}
+        >
+          {/* Mobile Top Bar (Back button + Favorite button) */}
+          <div className="flex items-center justify-between pb-3 pt-1">
+            <button
+              type="button"
+              onClick={() => {
+                if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  navigate({ to: '/' });
+                }
+              }}
+              aria-label="Voltar"
+              className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#2F1D15] border border-[#3F2319] text-[#CFB28C] hover:text-white transition-colors active:scale-95 shadow-sm"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              aria-label="Favoritar"
+              aria-pressed={!!nft.isLiked}
+              onClick={handleToggleFavorite}
+              className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#2F1D15] border border-[#3F2319] text-[#CFB28C] hover:text-[#D28A4C] transition-colors active:scale-95 shadow-sm"
+            >
+              <Heart
+                className={`h-4 w-4 ${nft.isLiked ? 'fill-[#D28A4C] text-[#D28A4C]' : ''}`}
+                aria-hidden
+              />
+              <span className="sr-only">{nft.likesCount}</span>
+            </button>
+          </div>
+
+          {/* Main Artwork Image */}
+          <div className="relative aspect-square w-full overflow-hidden rounded-[24px] bg-[#1e1512] shadow-xl mt-2">
+            <img
+              src={nft.imageUrl}
+              alt={nft.name}
+              width={600}
+              height={600}
+              {...{ fetchpriority: 'high' }}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* Middle Content Section (Card with rounded top corners) */}
+        <div className="relative -mt-4 rounded-t-[32px] bg-[#241612] px-6 pt-6 pb-6 space-y-4 shadow-md flex-1">
+          {/* Title & Rating Badge */}
+          <div className="flex items-center justify-between gap-3">
+            <h1 id="nft-title" className="text-xl font-bold font-mono text-[#F5F1EB] tracking-tight">
+              {nft.name}
+            </h1>
+
+            <div className="flex items-center gap-1 rounded-full border border-[#D28A4C] px-2.5 py-0.5 text-xs font-mono">
+              <Star className="h-3 w-3 fill-[#D28A4C] text-[#D28A4C]" aria-hidden />
+              <span className="font-bold text-[#F5F1EB]">4.8</span>
+              <span className="text-[#CFB28C]">(19)</span>
+            </div>
+          </div>
+
+          {/* Description Paragraph */}
+          <p className="text-xs leading-relaxed text-[#CFB28C] font-mono">
+            {nft.description ||
+              `Um colecionável digital 1/50 finalizado à mão da coleção Kurio Editions, verificado na Ethereum.`}
+          </p>
+
+          {/* Edition Selector */}
+          <div className="space-y-2 pt-1">
+            <label className="text-xs font-bold font-mono text-[#F5F1EB] block">
+              Edição:
+            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              {nft.editions.map((e) => {
+                const isSelected = e.id === edition.id;
+                return (
+                  <button
+                    key={e.id}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => {
+                      setEditionId(e.id);
+                      setQty(1);
+                      setMsg(undefined);
+                    }}
+                    className={`rounded-full px-3 py-1 font-mono text-xs transition ${
+                      isSelected
+                        ? 'border-2 border-[#D28A4C] bg-transparent text-[#D28A4C] font-bold shadow-sm'
+                        : 'border border-[#3F2319] bg-transparent text-[#CFB28C] hover:border-[#D28A4C]/50'
+                    }`}
+                  >
+                    {e.editionNumber}/{e.totalEditions}
+                  </button>
+                );
+              })}
+              <span className="inline-flex items-center rounded-full border border-[#3F2319] bg-transparent px-3 py-1 font-mono text-xs text-[#CFB28C]">
+                ABERTA
+              </span>
+            </div>
+          </div>
+
+          {/* Metadata List */}
+          <div className="space-y-2.5 pt-2 font-mono text-xs">
+            <div>
+              <span className="text-[#CFB28C]">ID do token: </span>
+              <span className="text-[#F5F1EB]">{nft.tokenId}</span>
+            </div>
+            <div>
+              <span className="text-[#CFB28C]">Coleção: </span>
+              <span className="text-[#F5F1EB]">{nft.collection}</span>
+            </div>
+            <div>
+              <span className="text-[#CFB28C]">Atributos: </span>
+              <span className="text-[#F5F1EB]">
+                {nft.attributes.map((a) => a.value).join(', ')}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Purchase Block (Full-width elevated bottom section) */}
+        <div className="mt-auto rounded-t-[40px] bg-[#241612] px-6 pt-5 pb-8 space-y-4 shadow-[0_-12px_28px_rgba(10,6,4,0.45)] border-0">
+          {/* Quantity & Price */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-mono text-[#CFB28C]">Qtd.</span>
+              <div className="flex items-center gap-2 font-mono">
+                <button
+                  type="button"
+                  aria-label="Diminuir"
+                  disabled={safeQty <= 1}
+                  onClick={() => setQty(safeQty - 1)}
+                  className="flex h-[30px] w-5 items-center justify-center rounded-[10px] bg-[#D28A4C] text-[#140D0A] font-bold text-sm disabled:opacity-40 active:scale-95 transition"
+                >
+                  −
+                </button>
+                <span className="min-w-4 text-center font-bold text-[#F5F1EB] text-sm" aria-live="polite">
+                  {safeQty}
+                </span>
+                <button
+                  type="button"
+                  aria-label="Aumentar"
+                  disabled={safeQty >= maxQty}
+                  onClick={() => setQty(safeQty + 1)}
+                  className="flex h-[30px] w-5 items-center justify-center rounded-[10px] bg-[#D28A4C] text-[#140D0A] font-bold text-sm disabled:opacity-40 active:scale-95 transition"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <span className="font-mono text-lg font-bold text-[#D28A4C]">
+                {edition.priceEth} ETH
+              </span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3">
+            <Button
+              size="lg"
+              disabled={unavailable || maxQty <= 0 || add.isPending}
+              onClick={() => {
+                handleAddToCart();
+                navigate({ to: '/checkout' });
+              }}
+              className="flex-1 h-[56px] rounded-full bg-gradient-to-r from-[#D28A4C] to-[#D28A4C]/85 text-[#140D0A] font-bold font-mono text-base hover:brightness-105 active:scale-98 transition shadow-md border-0"
+            >
+              Comprar NFT
+            </Button>
+
+            <button
+              type="button"
+              aria-label="Adicionar ao carrinho"
+              disabled={unavailable || maxQty <= 0 || add.isPending}
+              onClick={handleAddToCart}
+              className="flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-full bg-[#2F1D15] border border-[#3F2319] text-[#CFB28C] hover:text-[#D28A4C] hover:border-[#D28A4C]/50 transition active:scale-95 disabled:opacity-40 shadow-sm"
+            >
+              <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+              <span className="sr-only">Adicionar ao carrinho</span>
+            </button>
+          </div>
+
+          {msg && (
+            <p role="status" className={`text-xs font-mono font-medium ${msg.ok ? 'text-primary' : 'text-destructive'}`}>
+              {msg.text}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-16">

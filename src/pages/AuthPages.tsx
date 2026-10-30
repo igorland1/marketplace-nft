@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { errorMessage } from '@/lib/format';
@@ -45,6 +46,7 @@ function FacebookIcon({ className }: { className?: string }) {
 }
 
 export function LoginPage() {
+  const isMobile = useIsMobile();
   const { login } = useAuth();
   const search = useSearch({ from: '/login' });
   const navigate = useNavigate();
@@ -107,6 +109,176 @@ export function LoginPage() {
 
   function handleClose() {
     navigate({ to: safeRedirect(search.redirect) });
+  }
+
+  /* Mobile Login Screen (Figma: Login.pdf) */
+  if (isMobile) {
+    return (
+      <div className="flex min-h-[82vh] flex-col justify-between px-2 py-4">
+        {/* Top Header & Logo */}
+        <div className="space-y-8 pt-4 text-center">
+          <h1 className="text-3xl font-extrabold tracking-widest text-[#f5f1eb] font-mono">
+            KURIO
+          </h1>
+          <h2 id="login-title" className="text-xl font-bold font-mono text-[#f5f1eb]">
+            Entrar
+          </h2>
+        </div>
+
+        {/* Notices */}
+        <div className="space-y-2 pt-2">
+          {search.expired && (
+            <p role="status" className="rounded-xl bg-[#c38346]/10 border border-[#c38346]/30 p-2.5 text-center text-xs font-mono text-[#c38346]">
+              Sua sessão expirou. Entre novamente para continuar.
+            </p>
+          )}
+
+          {notice && (
+            <p role="status" className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-2.5 text-center text-xs font-mono text-emerald-400">
+              {notice}
+            </p>
+          )}
+
+          {formError && (
+            <p role="alert" className="rounded-xl bg-destructive/10 border border-destructive/30 p-2.5 text-center text-xs font-mono text-destructive">
+              {formError}
+            </p>
+          )}
+        </div>
+
+        {/* Login Form */}
+        <form onSubmit={submit} noValidate className="space-y-4 pt-3">
+          {/* E-mail */}
+          <div className="space-y-1">
+            <label htmlFor="email" className="sr-only">
+              E-mail
+            </label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="contato@email.com"
+              className={cn(
+                'h-12 rounded-xl border-[#38261e] bg-[#1a110d] px-4 text-xs font-mono text-[#f5f1eb] placeholder:text-[#cbb89d]/50 focus:border-[#c38346]',
+                errors.email && 'border-destructive'
+              )}
+            />
+            {errors.email && (
+              <p role="alert" className="text-[11px] font-mono text-destructive pl-1">
+                {errors.email}
+              </p>
+            )}
+          </div>
+
+          {/* Senha */}
+          <div className="space-y-1">
+            <label htmlFor="password" className="sr-only">
+              Senha
+            </label>
+            <div className="relative flex items-center">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="***********"
+                className={cn(
+                  'h-12 rounded-xl border-[#c38346]/80 bg-[#1a110d] pl-4 pr-12 text-xs font-mono text-[#f5f1eb] placeholder:text-[#cbb89d]/50 focus:border-[#c38346]',
+                  errors.password && 'border-destructive'
+                )}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                className="absolute right-4 text-[#cbb89d]/75 hover:text-[#f5f1eb] transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {errors.password && (
+              <p role="alert" className="text-[11px] font-mono text-destructive pl-1">
+                {errors.password}
+              </p>
+            )}
+          </div>
+
+          {/* Esqueceu a senha? */}
+          <div className="flex justify-end pt-0.5">
+            <button
+              type="button"
+              tabIndex={0}
+              onClick={handleForgotPassword}
+              className="text-xs font-mono text-[#c38346] hover:underline transition-colors"
+            >
+              Esqueceu a senha?
+            </button>
+          </div>
+
+          {/* Entrar Button */}
+          <button
+            type="submit"
+            disabled={busy}
+            className="w-full h-12 py-3.5 rounded-2xl bg-[#c38346] text-[#140d0a] font-mono text-base font-bold tracking-wide hover:bg-[#d49253] active:scale-98 transition-all shadow-md text-center block"
+          >
+            {busy ? 'Entrando…' : 'Entrar'}
+          </button>
+        </form>
+
+        {/* Divider: Ou continue com */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#38261e]" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-[#140d0a] px-3 font-mono text-xs text-[#cbb89d]/75">
+              Ou continue com
+            </span>
+          </div>
+        </div>
+
+        {/* Social Buttons */}
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => handleSocialLogin('Google')}
+            disabled={busy}
+            className="flex w-full h-12 items-center justify-center gap-3 rounded-xl border border-[#38261e] bg-[#1a110d] font-mono text-xs font-medium text-[#f5f1eb] hover:bg-[#251813] active:scale-98 transition-all"
+          >
+            <GoogleIcon />
+            <span>Continuar com Google</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleSocialLogin('Facebook')}
+            disabled={busy}
+            className="flex w-full h-12 items-center justify-center gap-3 rounded-xl border border-[#38261e] bg-[#1a110d] font-mono text-xs font-medium text-[#f5f1eb] hover:bg-[#251813] active:scale-98 transition-all"
+          >
+            <FacebookIcon />
+            <span>Continuar com Facebook</span>
+          </button>
+        </div>
+
+        {/* Bottom Link: Novo na Kurio? Crie uma conta */}
+        <div className="pt-8 pb-4 text-center">
+          <p className="font-mono text-xs text-[#cbb89d]/75">
+            Novo na Kurio?{' '}
+            <Link
+              to="/register"
+              search={search.redirect ? { redirect: search.redirect } : undefined}
+              className="font-bold text-[#f5f1eb] hover:underline transition-colors"
+            >
+              Crie uma conta
+            </Link>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -302,6 +474,7 @@ export function LoginPage() {
 }
 
 export function RegisterPage() {
+  const isMobile = useIsMobile();
   const { register, login } = useAuth();
   const search = useSearch({ from: '/register' });
   const navigate = useNavigate();
@@ -387,6 +560,231 @@ export function RegisterPage() {
 
   function handleClose() {
     navigate({ to: safeRedirect(search.redirect) });
+  }
+
+  /* Mobile Register Screen (Figma: Cadastro.pdf) */
+  if (isMobile) {
+    return (
+      <div className="flex min-h-[85vh] flex-col justify-between px-2 py-4">
+        {/* Top Header & Logo */}
+        <div className="space-y-6 pt-2 text-center">
+          <h1 className="text-3xl font-extrabold tracking-widest text-[#f5f1eb] font-mono">
+            KURIO
+          </h1>
+          <h2 id="register-title" className="text-base font-bold font-mono text-[#f5f1eb]">
+            Criar perfil de colecionador
+          </h2>
+        </div>
+
+        {/* Notices */}
+        {formError && (
+          <div className="pt-2">
+            <p role="alert" className="rounded-xl bg-destructive/10 border border-destructive/30 p-2.5 text-center text-xs font-mono text-destructive">
+              {formError}
+            </p>
+          </div>
+        )}
+
+        {/* Register Form */}
+        <form onSubmit={submit} noValidate className="space-y-3 pt-3">
+          {/* Nome completo */}
+          <div className="space-y-1">
+            <label htmlFor="name" className="sr-only">
+              Nome completo
+            </label>
+            <Input
+              id="name"
+              value={f.name}
+              onChange={set('name')}
+              placeholder="Nome completo"
+              className={cn(
+                'h-11 rounded-xl border-[#38261e] bg-[#1a110d] px-4 text-xs font-mono text-[#f5f1eb] placeholder:text-[#cbb89d]/50 focus:border-[#c38346]',
+                errors.name && 'border-destructive'
+              )}
+            />
+            {errors.name && (
+              <p role="alert" className="text-[11px] font-mono text-destructive pl-1">
+                {errors.name}
+              </p>
+            )}
+          </div>
+
+          {/* Nome de usuário */}
+          <div className="space-y-1">
+            <label htmlFor="username" className="sr-only">
+              Nome de usuário
+            </label>
+            <Input
+              id="username"
+              value={f.username}
+              onChange={set('username')}
+              placeholder="Nome de usuário"
+              className={cn(
+                'h-11 rounded-xl border-[#38261e] bg-[#1a110d] px-4 text-xs font-mono text-[#f5f1eb] placeholder:text-[#cbb89d]/50 focus:border-[#c38346]',
+                errors.username && 'border-destructive'
+              )}
+            />
+            {errors.username && (
+              <p role="alert" className="text-[11px] font-mono text-destructive pl-1">
+                {errors.username}
+              </p>
+            )}
+          </div>
+
+          {/* Digite seu e-mail */}
+          <div className="space-y-1">
+            <label htmlFor="email" className="sr-only">
+              E-mail
+            </label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={f.email}
+              onChange={set('email')}
+              placeholder="Digite seu e-mail"
+              className={cn(
+                'h-11 rounded-xl border-[#38261e] bg-[#1a110d] px-4 text-xs font-mono text-[#f5f1eb] placeholder:text-[#cbb89d]/50 focus:border-[#c38346]',
+                errors.email && 'border-destructive'
+              )}
+            />
+            {errors.email && (
+              <p role="alert" className="text-[11px] font-mono text-destructive pl-1">
+                {errors.email}
+              </p>
+            )}
+          </div>
+
+          {/* Senha */}
+          <div className="space-y-1">
+            <label htmlFor="password" className="sr-only">
+              Senha
+            </label>
+            <div className="relative flex items-center">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                value={f.password}
+                onChange={set('password')}
+                placeholder="Senha"
+                className={cn(
+                  'h-11 rounded-xl border-[#38261e] bg-[#1a110d] pl-4 pr-12 text-xs font-mono text-[#f5f1eb] placeholder:text-[#cbb89d]/50 focus:border-[#c38346]',
+                  errors.password && 'border-destructive'
+                )}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                className="absolute right-4 text-[#cbb89d]/75 hover:text-[#f5f1eb] transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {errors.password && (
+              <p role="alert" className="text-[11px] font-mono text-destructive pl-1">
+                {errors.password}
+              </p>
+            )}
+          </div>
+
+          {/* Confirmar senha */}
+          <div className="space-y-1">
+            <label htmlFor="confirmPassword" className="sr-only">
+              Confirmar senha
+            </label>
+            <div className="relative flex items-center">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                value={f.confirmPassword}
+                onChange={set('confirmPassword')}
+                placeholder="Confirmar senha"
+                className={cn(
+                  'h-11 rounded-xl border-[#38261e] bg-[#1a110d] pl-4 pr-12 text-xs font-mono text-[#f5f1eb] placeholder:text-[#cbb89d]/50 focus:border-[#c38346]',
+                  errors.confirmPassword && 'border-destructive'
+                )}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? 'Ocultar confirmação de senha' : 'Exibir confirmação de senha'}
+                className="absolute right-4 text-[#cbb89d]/75 hover:text-[#f5f1eb] transition-colors"
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <p role="alert" className="text-[11px] font-mono text-destructive pl-1">
+                {errors.confirmPassword}
+              </p>
+            )}
+          </div>
+
+          {/* Criar perfil Button */}
+          <button
+            type="submit"
+            disabled={busy}
+            className="w-full h-12 py-3 rounded-2xl bg-[#c38346] text-[#140d0a] font-mono text-base font-bold tracking-wide hover:bg-[#d49253] active:scale-98 transition-all shadow-md text-center block mt-2"
+          >
+            {busy ? 'Criando…' : 'Criar perfil'}
+          </button>
+        </form>
+
+        {/* Divider: Ou continue com */}
+        <div className="relative my-5">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#38261e]" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-[#140d0a] px-3 font-mono text-xs text-[#cbb89d]/75">
+              Ou continue com
+            </span>
+          </div>
+        </div>
+
+        {/* Social Buttons */}
+        <div className="space-y-2.5">
+          <button
+            type="button"
+            onClick={() => handleSocialLogin('Google')}
+            disabled={busy}
+            className="flex w-full h-11 items-center justify-center gap-3 rounded-xl border border-[#38261e] bg-[#1a110d] font-mono text-xs font-medium text-[#f5f1eb] hover:bg-[#251813] active:scale-98 transition-all"
+          >
+            <GoogleIcon />
+            <span>Continuar com Google</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleSocialLogin('Facebook')}
+            disabled={busy}
+            className="flex w-full h-11 items-center justify-center gap-3 rounded-xl border border-[#38261e] bg-[#1a110d] font-mono text-xs font-medium text-[#f5f1eb] hover:bg-[#251813] active:scale-98 transition-all"
+          >
+            <FacebookIcon />
+            <span>Continuar com Facebook</span>
+          </button>
+        </div>
+
+        {/* Bottom Link: Já tem uma conta? Entre */}
+        <div className="pt-6 pb-2 text-center">
+          <p className="font-mono text-xs text-[#cbb89d]/75">
+            Já tem uma conta?{' '}
+            <Link
+              to="/login"
+              search={search.redirect ? { redirect: search.redirect } : undefined}
+              className="font-bold text-[#f5f1eb] hover:underline transition-colors"
+            >
+              Entre
+            </Link>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
