@@ -301,10 +301,17 @@ export function LoginPage() {
 }
 
 export function RegisterPage() {
-  const { register } = useAuth();
+  const { register, login } = useAuth();
   const navigate = useNavigate();
-  const [f, setF] = useState({ name: '', username: '', email: '', password: '' });
+  const [f, setF] = useState({
+    name: '',
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string>();
   const [busy, setBusy] = useState(false);
@@ -324,19 +331,53 @@ export function RegisterPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (f.name.trim().length < 2) errs.name = 'Informe seu nome.';
-    if (!/^[a-zA-Z0-9_]{3,20}$/.test(f.username)) errs.username = '3 a 20 caracteres: letras, números ou _.';
-    if (!emailRe.test(f.email)) errs.email = 'Informe um e-mail válido.';
-    if (f.password.length < 8) errs.password = 'A senha deve ter ao menos 8 caracteres.';
+    const finalName = f.name.trim() || f.username.trim() || 'Novo Colecionador';
+
+    if (f.name.trim().length > 0 && f.name.trim().length < 2) {
+      errs.name = 'Informe seu nome completo.';
+    }
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(f.username.trim())) {
+      errs.username = '3 a 20 caracteres: letras, números ou _.';
+    }
+    if (!emailRe.test(f.email.trim())) {
+      errs.email = 'Informe um e-mail válido.';
+    }
+    if (f.password.length < 8) {
+      errs.password = 'A senha deve ter ao menos 8 caracteres.';
+    }
+    if (f.confirmPassword && f.confirmPassword !== f.password) {
+      errs.confirmPassword = 'As senhas não coincidem.';
+    }
+
     setErrors(errs);
     if (Object.keys(errs).length) return;
+
     setBusy(true);
     setFormError(undefined);
     try {
-      await register(f);
+      await register({
+        name: finalName,
+        username: f.username.trim(),
+        email: f.email.trim(),
+        password: f.password,
+      });
       navigate({ to: '/' });
     } catch (err) {
       setFormError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleSocialLogin(provider: string) {
+    setBusy(true);
+    setFormError(undefined);
+    try {
+      // Demo mock login
+      await login('satoshi@greenmint.io', 'password123');
+      navigate({ to: '/' });
+    } catch (err) {
+      setFormError(`Falha ao conectar com ${provider}: ${errorMessage(err)}`);
     } finally {
       setBusy(false);
     }
@@ -367,7 +408,7 @@ export function RegisterPage() {
           <X className="h-4 w-4" />
         </button>
 
-        {/* Tab Switcher */}
+        {/* Tab Switcher: Entrar | Criar conta (Figma: Criar conta is active) */}
         <div className="flex items-center justify-center gap-6 pt-1">
           <Link
             to="/login"
@@ -384,16 +425,17 @@ export function RegisterPage() {
           </button>
         </div>
 
-        {/* Subtitle */}
+        {/* Subtitle (Figma: Crie seu perfil de colecionador e conecte uma carteira quando quiser.) */}
         <p className="text-center text-xs leading-relaxed text-muted-foreground max-w-xs mx-auto">
-          Crie sua conta para colecionar, cunhar e negociar arte digital exclusiva na Kurio.
+          Crie seu perfil de colecionador e conecte uma carteira quando quiser.
         </p>
 
         {/* Register Form */}
         <form onSubmit={submit} noValidate className="space-y-3.5">
+          {/* Nome completo (Required for E2E tests and user profile) */}
           <div className="space-y-1">
             <label htmlFor="name" className="sr-only">
-              Nome
+              Nome completo
             </label>
             <div className="relative flex items-center">
               <User className="pointer-events-none absolute left-3.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
@@ -408,9 +450,10 @@ export function RegisterPage() {
             {errors.name && <p role="alert" className="text-[11px] text-destructive pl-1">{errors.name}</p>}
           </div>
 
+          {/* Nome de usuário (Figma: top 501 left 849) */}
           <div className="space-y-1">
             <label htmlFor="username" className="sr-only">
-              Usuário
+              Nome de usuário
             </label>
             <div className="relative flex items-center">
               <AtSign className="pointer-events-none absolute left-3.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
@@ -418,13 +461,14 @@ export function RegisterPage() {
                 id="username"
                 value={f.username}
                 onChange={set('username')}
-                placeholder="Nome de usuário (@usuario)"
+                placeholder="Nome de usuário"
                 className={cn('pl-10 h-10 text-xs font-mono', errors.username && 'border-destructive focus-visible:ring-destructive')}
               />
             </div>
             {errors.username && <p role="alert" className="text-[11px] text-destructive pl-1">{errors.username}</p>}
           </div>
 
+          {/* Digite seu e-mail (Figma: top 579 left 849) */}
           <div className="space-y-1">
             <label htmlFor="email" className="sr-only">
               E-mail
@@ -434,15 +478,17 @@ export function RegisterPage() {
               <Input
                 id="email"
                 type="email"
+                autoComplete="email"
                 value={f.email}
                 onChange={set('email')}
-                placeholder="contato@email.com"
+                placeholder="Digite seu e-mail"
                 className={cn('pl-10 h-10 text-xs font-mono', errors.email && 'border-destructive focus-visible:ring-destructive')}
               />
             </div>
             {errors.email && <p role="alert" className="text-[11px] text-destructive pl-1">{errors.email}</p>}
           </div>
 
+          {/* Senha (Figma: top 657 left 849) */}
           <div className="space-y-1">
             <label htmlFor="password" className="sr-only">
               Senha
@@ -455,7 +501,7 @@ export function RegisterPage() {
                 autoComplete="new-password"
                 value={f.password}
                 onChange={set('password')}
-                placeholder="Senha (mínimo 8 caracteres)"
+                placeholder="Senha"
                 className={cn('pl-10 pr-10 h-10 text-xs font-mono', errors.password && 'border-destructive focus-visible:ring-destructive')}
               />
               <button
@@ -471,12 +517,42 @@ export function RegisterPage() {
             {errors.password && <p role="alert" className="text-[11px] text-destructive pl-1">{errors.password}</p>}
           </div>
 
+          {/* Confirmar senha (Figma: top 735 left 849) */}
+          <div className="space-y-1">
+            <label htmlFor="confirmPassword" className="sr-only">
+              Confirmar senha
+            </label>
+            <div className="relative flex items-center">
+              <Lock className="pointer-events-none absolute left-3.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                value={f.confirmPassword}
+                onChange={set('confirmPassword')}
+                placeholder="Confirmar senha"
+                className={cn('pl-10 pr-10 h-10 text-xs font-mono', errors.confirmPassword && 'border-destructive focus-visible:ring-destructive')}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? 'Ocultar confirmação de senha' : 'Exibir confirmação de senha'}
+                className="absolute right-3 text-muted-foreground hover:text-foreground"
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {errors.confirmPassword && <p role="alert" className="text-[11px] text-destructive pl-1">{errors.confirmPassword}</p>}
+          </div>
+
           {formError && (
             <p role="alert" className="rounded-lg bg-destructive/10 p-2 text-center text-xs text-destructive">
               {formError}
             </p>
           )}
 
+          {/* Submit CTA Button (Figma: Criar conta) */}
           <Button
             type="submit"
             disabled={busy}
@@ -486,7 +562,44 @@ export function RegisterPage() {
           </Button>
         </form>
 
-        <p className="text-center text-xs text-muted-foreground">
+        {/* Divider: Ou continue com (Figma style) */}
+        <div className="relative my-3">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-card px-3 text-[11px] text-muted-foreground">
+              Ou continue com
+            </span>
+          </div>
+        </div>
+
+        {/* Social Buttons: Google & Facebook */}
+        <div className="space-y-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleSocialLogin('Google')}
+            disabled={busy}
+            className="w-full h-10 text-xs font-medium border-border/80 bg-background/50 hover:bg-background/90 gap-2.5"
+          >
+            <GoogleIcon />
+            <span>Continuar com Google</span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleSocialLogin('Facebook')}
+            disabled={busy}
+            className="w-full h-10 text-xs font-medium border-border/80 bg-background/50 hover:bg-background/90 gap-2.5"
+          >
+            <FacebookIcon />
+            <span>Continuar com Facebook</span>
+          </Button>
+        </div>
+
+        <p className="text-center text-xs text-muted-foreground pt-1">
           Já tem conta?{' '}
           <Link to="/login" search={{}} className="text-primary hover:underline font-semibold">
             Entrar
